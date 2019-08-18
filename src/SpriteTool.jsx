@@ -201,9 +201,14 @@ window.jwb = window.jwb || {};
             <tr>
               <td colSpan="2">
                 {
-                  <button onClick={this.downloadZip}>
+                  <button onClick={() => this.downloadZip()}>
                     Download!
                   </button>
+                }
+                {
+                  this.state.dataLink && (
+                    <a href={this.state.dataLink} download="sprites.zip">Download</a>
+                  )
                 }
               </td>
             </tr>
@@ -214,7 +219,17 @@ window.jwb = window.jwb || {};
 
     downloadZip() {
       generateDownloadLink().then(content => {
-        location.href = "data:application/zip;base64," + content;
+        const dataLink = "data:application/zip;base64," + content;
+
+        // SUUUUUPER HACK ALERT
+        const a = document.createElement('a');
+        a.href = dataLink;
+        a.download = 'sprites.zip';
+
+        a.hidden = true;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       })
     }
   }

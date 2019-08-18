@@ -21,7 +21,7 @@ window.jwb = window.jwb || {};
       },
       spriteDirectory: 'units/player',
     },
-    robed_wizard: {
+    /*robed_wizard: {
       equipment: [],
       activities: {
         standing: {
@@ -32,9 +32,9 @@ window.jwb = window.jwb || {};
         },
         vanishing: ['SE'],
         stunned: ['SE']
-      }
-    },
-    spriteDirectory: 'units/robed_wizard',
+      },
+      spriteDirectory: 'units/robed_wizard',
+    },*/
   };
 
   const EQUIPMENT_DATA = {
