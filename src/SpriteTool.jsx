@@ -1,53 +1,7 @@
 window.jwb = window.jwb || {};
 
 {
-  const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-  const UNIT_DATA = {
-    player: {
-      equipment: ['mail', 'sword', 'shield2'],
-      activities: {
-        standing: {
-          directions: DIRECTIONS,
-          frameNumbers: [1]
-        },
-        walking: {
-          directions: DIRECTIONS,
-          frameNumbers: [1, 2]
-        },
-        attacking: {
-          directions: DIRECTIONS,
-          frameNumbers: [1, 2, '2b']
-        }
-      },
-      spriteDirectory: 'units/player',
-    },
-    robed_wizard: {
-      equipment: [],
-      activities: {
-        standing: {
-          directions: ['SE'],
-        },
-        walking: {
-          directions: DIRECTIONS
-        },
-        vanishing: ['SE'],
-        stunned: ['SE']
-      }
-    },
-    spriteDirectory: 'units/robed_wizard',
-  };
-
-  const EQUIPMENT_DATA = {
-    mail: {
-      spriteDirectory: 'equipment/mail',
-    },
-    sword: {
-      spriteDirectory: 'equipment/sword',
-    },
-    shield2: {
-      spriteDirectory: 'equipment/shield2',
-    }
-  };
+  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, replaceColor, isBehind, comparing } = window.jwb.utils;
 
   class SpriteTool extends React.PureComponent {
     constructor(props) {
@@ -80,7 +34,6 @@ window.jwb = window.jwb || {};
           fieldValue.push(value);
         }
         this.setState({ [field]: fieldValue });
-        //this.forceUpdate(); // TODO Why do we need this? I hate React
       } else {
         this.setState({ [field]: value });
       }
@@ -205,23 +158,42 @@ window.jwb = window.jwb || {};
                 <div>
                   Preview
                 </div>
-                <div className="imageContainer" ref={div => this.imageContainer = div}>
+                <div className="previewContainer" ref={div => this.previewContainer = div}>
                   <img
                     name={this.state.unit}
-                    src={this._getImageFilename(this.state.unit)}
+                    src={getImageFilename(this.state.unit, this.state.activity, this.state.direction, this.state.frameNumber)}
                   />
                   {
-                    this.state.equipment.map(item => (
-                      <img
-                        name={item}
-                        src={this._getImageFilename(item)}
-                        key={item}
-                        onError={e => e.target.src = e.target.getAttribute('data-behind')}
-                        data-behind={this._getImageFilename(item, true)}
+                    this.state.equipment.map(spriteName => (
+                      <EquipmentImage
+                        spriteName={spriteName}
+                        activity={this.state.activity}
+                        direction={this.state.direction}
+                        frameNumber={this.state.frameNumber}
                       />
                     ))
                   }
                   <canvas ref={canvas => this.canvas = canvas} />
+                </div>
+              </td>
+            </tr>
+            {/* Render full sprite sheet */}
+            <tr>
+              <td colspan="2">
+                <div>
+                  Sprite Sheet
+                </div>
+                <div className="spriteSheetContainer" ref={div => this.spriteSheetContainer = div}>
+                  {/*
+                    UNIT_DATA
+                    UNIT_DATA[this.state.unit].activities.map(activity =>
+                      activity.directions.map(direction =>
+                        activity.frameNumbers.map(frameNumber =>
+                          getImageFilename(this.state.unit, this.state.activity, this.state.direction, this.state.frameNumber)
+                        )
+                      )
+                    )
+                  */}
                 </div>
               </td>
             </tr>
@@ -231,45 +203,41 @@ window.jwb = window.jwb || {};
     }
 
     componentDidMount() {
-     // this.spriteImages = {};
       this.renderPreview();
     }
 
     componentDidUpdate() {
-      //this.spriteImages = {};
       this.renderPreview();
     }
 
     renderPreview() {
-      const { canvas, imageContainer } = this;
+      const { canvas, previewContainer } = this;
       const context = canvas.getContext('2d', { antialias: false });
       context.imageSmoothingEnabled = false;
       context.setTransform(4, 0, 0, 4, 0, 0); // i. e. scale by (4x, 4x)
-     // context.globalCompositeOperation = 'source-in';
-      //context.globalCompositeOperation = "screen";
       context.fillStyle = '#ffffff';
       context.fillRect(0, 0, canvas.width, canvas.height);
-      const images = [...imageContainer.querySelectorAll('img')];
+      const images = [...previewContainer.querySelectorAll('img')];
       images.forEach(image => {
         if (image.complete) {
-          console.log(`${image.src} complete`);
           this._onImageLoad(image, canvas, context);
         } else {
-          console.log(`${image.src} not complete`);
           image.onload = () => this._onImageLoad(image, canvas, context);
         }
       });
     };
 
     _drawImages(canvas, context) {
-      const { imageContainer } = this;
-      const images = [...imageContainer.querySelectorAll('img')]
-        .filter(image => this._hasData(image, canvas, context));
+      const { previewContainer } = this;
+      const images = [...previewContainer.querySelectorAll('img')]
+        .filter(image => hasData(image, canvas, context));
 
-      const behindImages = images.filter(image => this._isBehind(image));
+      const behindImages = images.filter(image => isBehind(image))
+        .sort((comparing(image => EQUIPMENT_DATA[image.name].drawOrder)));
       const unitImage = images.filter(image => UNIT_DATA[image.name])[0];
       const aheadImages = images.filter(image => !UNIT_DATA[image.name])
-        .filter(image => !this._isBehind(image));
+        .filter(image => !isBehind(image))
+        .sort((comparing(image => EQUIPMENT_DATA[image.name].drawOrder)));
 
       const sortedImages = [...behindImages, unitImage, ...aheadImages];
       sortedImages.forEach(image => {
@@ -278,62 +246,30 @@ window.jwb = window.jwb || {};
         tmpCanvas.height = canvas.height;
         const tmpContext = tmpCanvas.getContext('2d');
         tmpContext.drawImage(image, 0, 0);
-        this._replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
+        replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
         context.drawImage(tmpCanvas, 0, 0);
       });
     }
 
     _onImageLoad(image, canvas, context) {
-      if (!this._hasData(image)) {
-        console.log(`${image.src} does not have data`);
+      if (!hasData(image)) {
         image.onload = () => this._onImageLoad(image, canvas, context);
         image.src = image.getAttribute('data-behind');
       } else {
-        console.log(`${image.src} has data`);
         this._drawImages(canvas, context);
       }
     }
-
-    _hasData(image) {
-      // TODO better way to do this?
-      return image.width && image.height;
-    }
-
-    _getImageFilename(spriteName, behind) {
-      const { activity, direction, frameNumber } = this.state;
-      const directory = this._getSpriteDirectory(spriteName);
-      return `${directory}/${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
-    }
-
-    _getSpriteDirectory(spriteName) {
-      if (UNIT_DATA[spriteName]) {
-        return `png/${UNIT_DATA[spriteName].spriteDirectory}`;
-      } else if (EQUIPMENT_DATA[spriteName]) {
-        return `png/${EQUIPMENT_DATA[spriteName].spriteDirectory}`;
-      }
-    }
-
-    _replaceColor(canvas, context, source, target) {
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < imageData.data.length; i += 4) {
-        if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === source[j]))) {
-          [0, 1, 2, 3].forEach(j => {
-            imageData.data[i + j] = target[j];
-          });
-        }
-      }
-      context.putImageData(imageData, 0, 0);
-    }
-
-    _isBehind(image) {
-      if (!image.getAttribute('data-behind')) {
-        return false;
-      }
-      const srcParts = image.src.split('/');
-      const behindParts = image.getAttribute('data-behind').split('/');
-      return srcParts[srcParts.length - 1] === behindParts[behindParts.length - 1];
-    }
   }
+
+  const EquipmentImage = ({ spriteName, activity, direction, frameNumber }) => (
+    <img
+      name={spriteName}
+      src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
+      key={spriteName}
+      onError={e => e.target.src = e.target.getAttribute('data-behind')}
+      data-behind={getImageFilename(spriteName, activity, direction, frameNumber, true)}
+    />
+  );
 
   window.jwb = { SpriteTool };
 }

@@ -9,10 +9,10 @@
   border: none;
   padding: 5px;
 }
-.SpriteTool .imageContainer {
+.SpriteTool .previewContainer {
   text-align: center;
 }
-.SpriteTool .imageContainer img {
+.SpriteTool .previewContainer img {
   display: none;
 }
 .SpriteTool canvas {
