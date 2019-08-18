@@ -9,10 +9,13 @@
   border: none;
   padding: 5px;
 }
-.SpriteTool .previewContainer {
+.SpriteTool .preview {
   text-align: center;
 }
-.SpriteTool .previewContainer img {
+.SpriteTool .preview img {
+  display: none;
+}
+.SpriteTool .spriteSheet img {
   display: none;
 }
 .SpriteTool canvas {

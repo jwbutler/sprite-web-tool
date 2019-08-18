@@ -158,71 +158,40 @@ window.jwb = window.jwb || {};
                 <div>
                   Preview
                 </div>
-                <div className="previewContainer" ref={div => this.previewContainer = div}>
-                  <img
-                    name={this.state.unit}
-                    src={getImageFilename(this.state.unit, this.state.activity, this.state.direction, this.state.frameNumber)}
+                <div className="preview">
+                  <CompositeSprite
+                    unit={this.state.unit}
+                    equipment={this.state.equipment}
+                    activity={this.state.activity}
+                    direction={this.state.direction}
+                    frameNumber={this.state.frameNumber}
+                    width={160}
+                    height={160}
                   />
-                  {
-                    this.state.equipment.map(spriteName => (
-                      <EquipmentImage
-                        spriteName={spriteName}
-                        activity={this.state.activity}
-                        direction={this.state.direction}
-                        frameNumber={this.state.frameNumber}
-                      />
-                    ))
-                  }
-                  <canvas ref={canvas => this.canvas = canvas} />
                 </div>
               </td>
             </tr>
-            {/* Render full sprite sheet */}
+            {/* Render full sprite table */}
             <tr>
-              <td colspan="2">
-                <div>
-                  Sprite Sheet
-                </div>
-                <div className="spriteSheetContainer" ref={div => this.spriteSheetContainer = div}>
+              <td colSpan="2">
+                <div className="spriteSheet">
                   {
-                    // Render each image for the unit
                     Object.entries(UNIT_DATA[this.state.unit].activities)
-                      .map(([activity, {directions, frameNumbers}]) => (
-                        <div>
-                          {
-                            frameNumbers.map(frameNumber =>
-                              directions.map(direction =>
-                                <img
-                                  name={`${this.state.unit}_${activity}_${direction}_${frameNumber}`}
-                                  src={getImageFilename(this.state.unit, activity, direction, frameNumber)}
-                                />
-                              )
-                            )
-                          }
-                        </div>
-                      ))
-                  }
-                  {
-                    // Render each image each equipment item
-                    this.state.equipment.map(item =>
-                      Object.entries(UNIT_DATA[this.state.unit].activities)
-                        .map(([activity, {directions, frameNumbers}]) => (
-                          <div>
-                            {
-                              frameNumbers.map(frameNumber =>
-                                directions.map(direction =>
-                                  <EquipmentImage
-                                    spriteName={item}
-                                    activity={activity}
-                                    direction={direction}
-                                    frameNumber={frameNumber}
-                                  />
-                                )
-                              )
-                            }
-                          </div>
-                        ))
-                    )
+                      .map(([activity, { directions, frameNumbers }]) =>
+                        frameNumbers.map(frameNumber =>
+                          directions.map(direction =>
+                            <CompositeSprite
+                              unit={this.state.unit}
+                              equipment={this.state.equipment}
+                              activity={activity}
+                              direction={direction}
+                              frameNumber={frameNumber}
+                              width={40}
+                              height={40}
+                            />
+                          )
+                        )
+                      )
                   }
                 </div>
               </td>
@@ -231,75 +200,7 @@ window.jwb = window.jwb || {};
         </div>
       );
     }
-
-    componentDidMount() {
-      this.renderPreview();
-    }
-
-    componentDidUpdate() {
-      this.renderPreview();
-    }
-
-    renderPreview() {
-      const { canvas, previewContainer } = this;
-      const context = canvas.getContext('2d', { antialias: false });
-      context.imageSmoothingEnabled = false;
-      context.setTransform(4, 0, 0, 4, 0, 0); // i. e. scale by (4x, 4x)
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      const images = [...previewContainer.querySelectorAll('img')];
-      images.forEach(image => {
-        if (image.complete) {
-          this._onImageLoad(image, canvas, context);
-        } else {
-          image.onload = () => this._onImageLoad(image, canvas, context);
-        }
-      });
-    };
-
-    _drawImages(canvas, context) {
-      const { previewContainer } = this;
-      const images = [...previewContainer.querySelectorAll('img')]
-        .filter(image => hasData(image, canvas, context));
-
-      const behindImages = images.filter(image => isBehind(image))
-        .sort((comparing(image => EQUIPMENT_DATA[image.name].drawOrder)));
-      const unitImage = images.filter(image => UNIT_DATA[image.name])[0];
-      const aheadImages = images.filter(image => !UNIT_DATA[image.name])
-        .filter(image => !isBehind(image))
-        .sort((comparing(image => EQUIPMENT_DATA[image.name].drawOrder)));
-
-      const sortedImages = [...behindImages, unitImage, ...aheadImages];
-      sortedImages.forEach(image => {
-        const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
-        const tmpContext = tmpCanvas.getContext('2d');
-        tmpContext.drawImage(image, 0, 0);
-        replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
-        context.drawImage(tmpCanvas, 0, 0);
-      });
-    }
-
-    _onImageLoad(image, canvas, context) {
-      if (!hasData(image)) {
-        image.onload = () => this._onImageLoad(image, canvas, context);
-        image.src = image.getAttribute('data-behind');
-      } else {
-        this._drawImages(canvas, context);
-      }
-    }
   }
-
-  const EquipmentImage = ({ spriteName, activity, direction, frameNumber }) => (
-    <img
-      name={spriteName}
-      src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
-      key={spriteName}
-      onError={e => e.target.src = e.target.getAttribute('data-behind')}
-      data-behind={getImageFilename(spriteName, activity, direction, frameNumber, true)}
-    />
-  );
 
   window.jwb = { SpriteTool };
 }
