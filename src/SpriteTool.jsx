@@ -66,8 +66,6 @@ window.jwb = window.jwb || {};
         frameNumber,
         equipment
       };
-
-      this.spriteImages = {};
     }
 
     onChange(e) {
@@ -217,9 +215,9 @@ window.jwb = window.jwb || {};
                       <img
                         name={item}
                         src={this._getImageFilename(item)}
-                        data-behind={this._getImageFilename(item, true)}
                         key={item}
                         onError={e => e.target.src = e.target.getAttribute('data-behind')}
+                        data-behind={this._getImageFilename(item, true)}
                       />
                     ))
                   }
@@ -263,14 +261,26 @@ window.jwb = window.jwb || {};
       });
     };
 
-    _drawImage(image, canvas, context) {
-      const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = canvas.width;
-      tmpCanvas.height = canvas.height;
-      const tmpContext = tmpCanvas.getContext('2d');
-      tmpContext.drawImage(image, 0, 0);
-      this._replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
-      context.drawImage(tmpCanvas, 0, 0);
+    _drawImages(canvas, context) {
+      const { imageContainer } = this;
+      const images = [...imageContainer.querySelectorAll('img')]
+        .filter(image => this._hasData(image, canvas, context));
+
+      const behindImages = images.filter(image => this._isBehind(image));
+      const unitImage = images.filter(image => UNIT_DATA[image.name])[0];
+      const aheadImages = images.filter(image => !UNIT_DATA[image.name])
+        .filter(image => !this._isBehind(image));
+
+      const sortedImages = [...behindImages, unitImage, ...aheadImages];
+      sortedImages.forEach(image => {
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = canvas.width;
+        tmpCanvas.height = canvas.height;
+        const tmpContext = tmpCanvas.getContext('2d');
+        tmpContext.drawImage(image, 0, 0);
+        this._replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
+        context.drawImage(tmpCanvas, 0, 0);
+      });
     }
 
     _onImageLoad(image, canvas, context) {
@@ -280,7 +290,7 @@ window.jwb = window.jwb || {};
         image.src = image.getAttribute('data-behind');
       } else {
         console.log(`${image.src} has data`);
-        this._drawImage(image, canvas, context);
+        this._drawImages(canvas, context);
       }
     }
 
@@ -313,6 +323,15 @@ window.jwb = window.jwb || {};
         }
       }
       context.putImageData(imageData, 0, 0);
+    }
+
+    _isBehind(image) {
+      if (!image.getAttribute('data-behind')) {
+        return false;
+      }
+      const srcParts = image.src.split('/');
+      const behindParts = image.getAttribute('data-behind').split('/');
+      return srcParts[srcParts.length - 1] === behindParts[behindParts.length - 1];
     }
   }
 
