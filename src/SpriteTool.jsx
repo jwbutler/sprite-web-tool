@@ -184,16 +184,46 @@ window.jwb = window.jwb || {};
                   Sprite Sheet
                 </div>
                 <div className="spriteSheetContainer" ref={div => this.spriteSheetContainer = div}>
-                  {/*
-                    UNIT_DATA
-                    UNIT_DATA[this.state.unit].activities.map(activity =>
-                      activity.directions.map(direction =>
-                        activity.frameNumbers.map(frameNumber =>
-                          getImageFilename(this.state.unit, this.state.activity, this.state.direction, this.state.frameNumber)
-                        )
-                      )
+                  {
+                    // Render each image for the unit
+                    Object.entries(UNIT_DATA[this.state.unit].activities)
+                      .map(([activity, {directions, frameNumbers}]) => (
+                        <div>
+                          {
+                            frameNumbers.map(frameNumber =>
+                              directions.map(direction =>
+                                <img
+                                  name={`${this.state.unit}_${activity}_${direction}_${frameNumber}`}
+                                  src={getImageFilename(this.state.unit, activity, direction, frameNumber)}
+                                />
+                              )
+                            )
+                          }
+                        </div>
+                      ))
+                  }
+                  {
+                    // Render each image each equipment item
+                    this.state.equipment.map(item =>
+                      Object.entries(UNIT_DATA[this.state.unit].activities)
+                        .map(([activity, {directions, frameNumbers}]) => (
+                          <div>
+                            {
+                              frameNumbers.map(frameNumber =>
+                                directions.map(direction =>
+                                  <EquipmentImage
+                                    spriteName={item}
+                                    activity={activity}
+                                    direction={direction}
+                                    frameNumber={frameNumber}
+                                  />
+                                )
+                              )
+                            }
+                          </div>
+                        ))
                     )
-                  */}
+                  }
                 </div>
               </td>
             </tr>
