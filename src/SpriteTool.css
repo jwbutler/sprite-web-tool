@@ -1,0 +1,19 @@
+.SpriteTool table {
+  border-collapse: collapse;
+}
+.SpriteTool table td,th {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+.SpriteTool table table td,th {
+  border: none;
+  padding: 5px;
+}
+.SpriteTool .imageContainer {
+  text-align: center;
+}
+.SpriteTool .imageContainer img {
+  display: none;
+}
+.SpriteTool canvas {
+}
