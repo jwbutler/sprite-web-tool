@@ -1,7 +1,7 @@
 window.jwb = window.jwb || {};
 
 {
-  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, replaceColor, isBehind, comparing } = window.jwb.utils;
+  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, replaceColor, isBehind, comparing, generateDownloadLink } = window.jwb.utils;
 
   class SpriteTool extends React.PureComponent {
     constructor(props) {
@@ -18,7 +18,8 @@ window.jwb = window.jwb || {};
         activity,
         direction,
         frameNumber,
-        equipment
+        equipment,
+        dataBlob: null
       };
     }
 
@@ -196,9 +197,25 @@ window.jwb = window.jwb || {};
                 </div>
               </td>
             </tr>
+            {/* Render save button */}
+            <tr>
+              <td colSpan="2">
+                {
+                  <button onClick={this.downloadZip}>
+                    Download!
+                  </button>
+                }
+              </td>
+            </tr>
           </table>
         </div>
       );
+    }
+
+    downloadZip() {
+      generateDownloadLink().then(content => {
+        location.href = "data:application/zip;base64," + content;
+      })
     }
   }
 

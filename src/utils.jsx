@@ -73,6 +73,11 @@ window.jwb = window.jwb || {};
     return `${directory}/${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
   };
 
+  const getShortFilename = (spriteName, activity, direction, frameNumber, behind) => {
+    const directory = _getSpriteDirectory(spriteName);
+    return `${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
+  };
+
   const replaceColor = (canvas, context, source, target) => {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < imageData.data.length; i += 4) {
@@ -101,5 +106,21 @@ window.jwb = window.jwb || {};
 
   const comparing = (keyFunction) => ((a, b) => keyFunction(a) - keyFunction(b));
 
-  window.jwb.utils = { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, replaceColor, isBehind, comparing };
+  /**
+   * @returns {Promise<Blob>}
+   */
+  const generateDownloadLink = () => {
+    const canvases = document.querySelectorAll('canvas[data-blob][data-filename]');
+    const zip = new JSZip();
+    for (let i = 0; i < canvases.length; i++) {
+      const canvas = canvases[i];
+      zip.file(canvas.getAttribute('data-filename'), canvas.getAttribute('data-blob'), { base64: true });
+    }
+    return zip.generateAsync({
+      //type: 'blob'
+      type: 'base64'
+    });
+  };
+
+  window.jwb.utils = { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, getShortFilename, replaceColor, isBehind, comparing, generateDownloadLink };
 }

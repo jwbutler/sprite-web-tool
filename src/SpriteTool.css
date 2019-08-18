@@ -15,8 +15,9 @@
 .SpriteTool .preview img {
   display: none;
 }
-.SpriteTool .spriteSheet img {
+.SpriteTool .spriteSheet img.hidden {
   display: none;
 }
-.SpriteTool canvas {
+.SpriteTool .spriteSheet img.composite {
+  display: inline;
 }
