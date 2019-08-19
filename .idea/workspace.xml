@@ -43,14 +43,14 @@
           <entry key="css" value="452" />
           <entry key="html" value="749" />
           <entry key="js" value="374" />
-          <entry key="jsx" value="18579" />
+          <entry key="jsx" value="18788" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CSS" value="452" />
           <entry key="HTML" value="751" />
-          <entry key="JSX Harmony" value="18577" />
+          <entry key="JSX Harmony" value="18786" />
           <entry key="JavaScript" value="374" />
         </counts>
       </usages-collector>
@@ -62,7 +62,7 @@
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
-              <caret line="17" column="24" lean-forward="true" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
+              <caret line="17" column="24" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -71,16 +71,16 @@
         <entry file="file://$PROJECT_DIR$/src/main.jsx">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="84">
-              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/SpriteTool.jsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret lean-forward="true" />
+            <state relative-caret-position="315">
+              <caret line="132" column="59" lean-forward="true" selection-start-line="132" selection-start-column="59" selection-end-line="132" selection-end-column="59" />
             </state>
           </provider>
         </entry>
@@ -89,16 +89,16 @@
         <entry file="file://$PROJECT_DIR$/src/CompositeSprite.jsx">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="279">
-              <caret line="103" column="24" lean-forward="true" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
+              <caret line="103" column="24" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/utils.jsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+            <state relative-caret-position="405">
+              <caret line="75" column="41" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -107,7 +107,7 @@
         <entry file="file://$PROJECT_DIR$/src/SpriteTool.css">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="322">
-              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -123,7 +123,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>console</find>
       <find>data-behind</find>
       <find>imagecontainer</find>
       <find>_getImageFilename</find>
@@ -153,6 +152,7 @@
       <find>preview</find>
       <find>canvas</find>
       <find>url</find>
+      <find>sorte</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -168,8 +168,8 @@
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/src/SpriteTool.css" />
         <option value="$PROJECT_DIR$/src/CompositeSprite.jsx" />
-        <option value="$PROJECT_DIR$/src/SpriteTool.jsx" />
         <option value="$PROJECT_DIR$/src/utils.jsx" />
+        <option value="$PROJECT_DIR$/src/SpriteTool.jsx" />
       </list>
     </option>
   </component>
@@ -247,7 +247,7 @@
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1566171144138" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1566173795421" />
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/create-react-app-master" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="C:/lib/nodejs/node" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -323,12 +323,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1566082976747</updated>
-      <workItem from="1566082978137" duration="31667000" />
+      <workItem from="1566082978137" duration="32586000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31667000" />
+    <option name="totallyTimeSpent" value="32586000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1760" height="1056" extended-state="0" />
@@ -390,42 +390,42 @@
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
-          <caret line="17" column="24" lean-forward="true" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
+          <caret line="17" column="24" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SpriteTool.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="322">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main.jsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/SpriteTool.jsx">
+    <entry file="file://$PROJECT_DIR$/src/utils.jsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret lean-forward="true" />
+        <state relative-caret-position="405">
+          <caret line="75" column="41" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CompositeSprite.jsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="279">
-          <caret line="103" column="24" lean-forward="true" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
+          <caret line="103" column="24" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils.jsx">
+    <entry file="file://$PROJECT_DIR$/src/SpriteTool.jsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+        <state relative-caret-position="315">
+          <caret line="132" column="59" lean-forward="true" selection-start-line="132" selection-start-column="59" selection-end-line="132" selection-end-column="59" />
         </state>
       </provider>
     </entry>

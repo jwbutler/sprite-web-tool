@@ -4,7 +4,7 @@ window.jwb = window.jwb || {};
   const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const UNIT_DATA = {
     player: {
-      equipment: ['mail', 'sword', 'shield2'],
+      equipment: ['mail', 'sword', 'shield2', 'hat', 'hat2', 'hairpiece', 'beard', 'helmet', 'helm2', 'spear', 'club', 'cloak'],
       activities: {
         standing: {
           directions: DIRECTIONS,
@@ -20,6 +20,24 @@ window.jwb = window.jwb || {};
         }
       },
       spriteDirectory: 'units/player',
+    },
+    zombie: {
+      equipment: [],
+      activities: {
+        standing: {
+          directions: DIRECTIONS,
+          frameNumbers: [1]
+        },
+        walking: {
+          directions: DIRECTIONS,
+          frameNumbers: [1, 2]
+        },
+        attacking: {
+          directions: DIRECTIONS,
+          frameNumbers: [1, 2, '2b']
+        }
+      },
+      spriteDirectory: 'units/zombie',
     },
     /*robed_wizard: {
       equipment: [],
@@ -46,9 +64,53 @@ window.jwb = window.jwb || {};
       spriteDirectory: 'equipment/sword',
       drawOrder: 1,
     },
+    shield: {
+      spriteDirectory: 'equipment/shield',
+      drawOrder: 2,
+    },
     shield2: {
       spriteDirectory: 'equipment/shield2',
       drawOrder: 2,
+    },
+    shield3: {
+      spriteDirectory: 'equipment/shield3',
+      drawOrder: 2,
+    },
+    hat: {
+      spriteDirectory: 'equipment/hat',
+      drawOrder: 4,
+    },
+    hat2: {
+      spriteDirectory: 'equipment/hat2',
+      drawOrder: 4,
+    },
+    helmet: {
+      spriteDirectory: 'equipment/helmet',
+      drawOrder: 4,
+    },
+    helm2: {
+      spriteDirectory: 'equipment/helm2',
+      drawOrder: 4,
+    },
+    spear: {
+      spriteDirectory: 'equipment/spear',
+      drawOrder: 1,
+    },
+    club: {
+      spriteDirectory: 'equipment/club',
+      drawOrder: 1,
+    },
+    cloak: {
+      spriteDirectory: 'equipment/cloak',
+      drawOrder: 0,
+    },
+    hairpiece: {
+      spriteDirectory: 'equipment/hat',
+      drawOrder: 3,
+    },
+    beard: {
+      spriteDirectory: 'equipment/beard',
+      drawOrder: 3,
     }
   };
 

@@ -130,25 +130,26 @@ window.jwb = window.jwb || {};
               <td>
                 <table>
                 {
-                  UNIT_DATA[this.state.unit].equipment.map(item => {
-                    return (
-                      <tr>
-                        <td>
-                          {item}
-                        </td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            name="equipment"
-                            value={item}
-                            checked={this.state.equipment.indexOf(item) > -1}
-                            onChange={e => this.onChange(e)}
-                            key={item}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })
+                  UNIT_DATA[this.state.unit].equipment.sort()
+                    .map(item => {
+                      return (
+                        <tr>
+                          <td>
+                            {item}
+                          </td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              name="equipment"
+                              value={item}
+                              checked={this.state.equipment.indexOf(item) > -1}
+                              onChange={e => this.onChange(e)}
+                              key={item}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })
                 }
                 </table>
               </td>
