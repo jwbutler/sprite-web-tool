@@ -136,20 +136,37 @@ window.jwb = window.jwb || {};
   };
 
   const getShortFilename = (spriteName, activity, direction, frameNumber, behind) => {
-    const directory = _getSpriteDirectory(spriteName);
     return `${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
   };
 
-  const replaceColor = (canvas, context, source, target) => {
+  /**
+   * @param {HTMLImageElement} image
+   * @param {Object} colorMap A map of (hex => hex) OR (hex => [r, g, b, a])
+   */
+  const replaceColors = (image, colorMap) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < imageData.data.length; i += 4) {
-      if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === source[j]))) {
-        [0, 1, 2, 3].forEach(j => {
-          imageData.data[i + j] = target[j];
-        });
+    Object.entries(colorMap).forEach(([source, dest]) => {
+      const sourceRGBA = hex2rgba(source);
+      const destRGBA = (dest[0] === '#' ? hex2rgba(dest) : dest);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === sourceRGBA[j]))) {
+          [0, 1, 2, 3].forEach(j => {
+            imageData.data[i + j] = destRGBA[j];
+          });
+        }
       }
-    }
+    });
     context.putImageData(imageData, 0, 0);
+
+    const swappedImage = document.createElement('img');
+    swappedImage.src = canvas.toDataURL('image/png');
+    return swappedImage;
+
   };
 
   /**
@@ -178,10 +195,7 @@ window.jwb = window.jwb || {};
       const canvas = canvases[i];
       zip.file(canvas.getAttribute('data-filename'), canvas.getAttribute('data-blob'), { base64: true });
     }
-    return zip.generateAsync({
-      //type: 'blob'
-      type: 'base64'
-    });
+    return zip.generateAsync({ type: 'base64' });
   };
 
   /**
@@ -195,6 +209,17 @@ window.jwb = window.jwb || {};
   };
 
   const rgb2hex = (r, g, b) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
+
+  /**
+   * @param {String} hex e.g. '#abcdef'
+   * @return {Array<int>} [r, g, b, 255]
+   */
+  const hex2rgba = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b, 255];
+  };
 
   /**
    * TODO: Assumes that any one frame will have all the colors for every animation.
@@ -253,12 +278,13 @@ window.jwb = window.jwb || {};
     hasData,
     getImageFilename,
     getShortFilename,
-    replaceColor,
+    replaceColors,
     isBehind,
     comparing,
     generateDownloadLink,
     getAnyFrame,
     getImageColors,
-    rgb2hex
+    rgb2hex,
+    hex2rgba
   };
 }

@@ -1,7 +1,7 @@
 window.jwb = window.jwb || {};
 
 {
-  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, getShortFilename, replaceColor, isBehind, comparing } = window.jwb.utils;
+  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, getShortFilename, replaceColors, isBehind, comparing } = window.jwb.utils;
 
   const UnitImage = ({ spriteName, activity, direction, frameNumber }) => (
     <img
@@ -85,13 +85,8 @@ window.jwb = window.jwb || {};
 
       const sortedImages = [...behindImages, unitImage, ...aheadImages];
       sortedImages.forEach(image => {
-        const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = canvas.width;
-        tmpCanvas.height = canvas.height;
-        const tmpContext = tmpCanvas.getContext('2d');
-        tmpContext.drawImage(image, 0, 0);
-        replaceColor(tmpCanvas, tmpContext, [255, 255, 255, 255], [0, 0, 0, 0]);
-        context.drawImage(tmpCanvas, 0, 0);
+        image = replaceColors(image, { '#ff0000': [0, 0, 0, 0] });
+        context.drawImage(image, 0, 0);
       });
 
       const compositeImage = canvas.toDataURL("image/png").split('base64,')[1];

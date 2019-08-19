@@ -1,0 +1,43 @@
+.PaletteSwapModal {
+  position: fixed;
+  left: 20vw;
+  width: 60vw;
+  top: 20vh;
+  height: 60vh;
+  background-color: #FFFFFF;
+  box-shadow: 2px 2px 4px 4px #DDDDDD;
+  overflow: auto;
+}
+
+.PaletteSwapModal .spritePane {
+}
+.PaletteSwapModal .spritePane img {
+  position: fixed;
+  top: calc(50% - 80px);
+  width: 160px;
+  height: 160px;
+  image-rendering: optimizeSpeed;
+}
+
+.PaletteSwapModal .colorPane {
+  margin-left: 200px;
+}
+
+.PaletteSwapModal .swatch {
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 10px;
+  vertical-align: middle;
+}
+
+.PaletteSwapModal input[type=color] {
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+  border: 1px solid black;
+  border-radius: 3px;
+  padding: 3px;
+}
