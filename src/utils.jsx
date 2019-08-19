@@ -184,5 +184,81 @@ window.jwb = window.jwb || {};
     });
   };
 
-  window.jwb.utils = { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, getShortFilename, replaceColor, isBehind, comparing, generateDownloadLink };
+  /**
+   * @private
+   */
+  const _zeroPad = (string, length) => {
+    while (string.length < length) {
+      string = `0${string}`;
+    }
+    return string;
+  };
+
+  const rgb2hex = (r, g, b) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
+
+  /**
+   * TODO: Assumes that any one frame will have all the colors for every animation.
+   *
+   * @param {HTMLImageElement} image
+   */
+  const getImageColors = (image) => {
+    const colors = {};
+    const tmpCanvas = document.createElement('canvas');
+    const tmpContext = tmpCanvas.getContext('2d');
+    tmpCanvas.width = image.width;
+    tmpCanvas.height = image.height;
+    tmpContext.drawImage(image, 0, 0);
+    const imageData = tmpContext.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const [r, g, b, a] = imageData.data.slice(i, i + 4);
+      const hex = rgb2hex(r, g, b);
+      colors[hex] = hex;
+    }
+    return Object.values(colors);
+  };
+
+  /**
+   * @return {Promise<HTMLImageElement>}
+   */
+  const getAnyFrame = (spriteName) => {
+    let activities;
+    if (UNIT_DATA.hasOwnProperty(spriteName)) {
+      activities = UNIT_DATA[spriteName].activities;
+    } else { // equipment
+      const unitName = Object.keys(UNIT_DATA).find(u => UNIT_DATA[u].equipment.indexOf(spriteName) > -1);
+      activities = UNIT_DATA[unitName].activities;
+    }
+    const activity = Object.keys(activities)[0];
+    const direction = activities[activity].directions[0];
+    const frameNumber = activities[activity].frameNumbers[0];
+
+    const baseFilename = getImageFilename(spriteName, activity, direction, frameNumber, false);
+    const behindFilename = getImageFilename(spriteName, activity, direction, frameNumber, true);
+
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+
+      img.src = baseFilename;
+      img.onload = () => resolve(img);
+      img.onerror = () => {
+        img.src = behindFilename;
+        resolve(img);
+      };
+    })
+  };
+
+  window.jwb.utils = {
+    UNIT_DATA,
+    EQUIPMENT_DATA,
+    hasData,
+    getImageFilename,
+    getShortFilename,
+    replaceColor,
+    isBehind,
+    comparing,
+    generateDownloadLink,
+    getAnyFrame,
+    getImageColors,
+    rgb2hex
+  };
 }

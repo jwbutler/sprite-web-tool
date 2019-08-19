@@ -214,6 +214,7 @@ window.jwb = window.jwb || {};
               </td>
             </tr>
           </table>
+          <PaletteSwapModal spriteName="player" />
         </div>
       );
     }
