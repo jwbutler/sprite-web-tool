@@ -4,7 +4,7 @@ window.jwb = window.jwb || {};
   const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const UNIT_DATA = {
     player: {
-      equipment: ['mail', 'sword', 'shield2', 'hat', 'hat2', 'hairpiece', 'beard', 'helmet', 'helm2', 'spear', 'club', 'cloak'],
+      equipment: ['mail', 'sword', 'shield', 'shield2', 'shield3', 'hat', 'hat2', 'hairpiece', 'beard', 'helmet', 'helm2', 'spear', 'club', 'cloak'],
       activities: {
         standing: {
           directions: DIRECTIONS,
