@@ -4,7 +4,7 @@ window.jwb = window.jwb || {};
   const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const UNIT_DATA = {
     player: {
-      equipment: ['bow', 'beard', 'cloak', 'club', 'hat', 'hat2', 'helmet', 'helm2', 'mail', 'shield', 'shield2', 'shield3', 'sword'], // TODO SPEAR
+      equipment: ['bow', 'beard', 'cloak', 'club', 'crown', 'hat', 'hat2', 'helmet', 'helm2', 'mail', 'shield', 'shield2', 'shield3', 'sword'], // TODO SPEAR
       activities: {
         standing: {
           directions: DIRECTIONS,
@@ -89,6 +89,10 @@ window.jwb = window.jwb || {};
     club: {
       spriteDirectory: 'equipment/club',
       drawOrder: 1,
+    },
+    crown: {
+      spriteDirectory: 'equipment/crown',
+      drawOrder: 4,
     },
     hat: {
       spriteDirectory: 'equipment/hat',
