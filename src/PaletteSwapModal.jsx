@@ -16,42 +16,40 @@ window.jwb = window.jwb || {};
     render() {
       return (
         <div className="PaletteSwapModal">
-          <div className="spritePane">
-            {/* Can't use this.state.baseImage directly because React /shrug */}
-            {/*
-              this.state.baseImage && (
-                <img src={this.state.baseImage.src} />
-              )
-            */}
-            {
-              this.state.swappedImage && (
-                <img src={this.state.swappedImage.src} />
-              )
-            }
-          </div>
-          <div className="colorPane">
-            {
-              Object.entries(this.state.colorMap)
-                .map(([source, dest]) => {
-                  return (
-                    <div key={source}>
-                      <div className="swatch" style={{ backgroundColor: source }} />
-                      <input
-                        type="color"
-                        value={this.state.colorMap[source]}
-                        onChange={e => {
-                          this.setState({
-                            colorMap: {
-                              ...this.state.colorMap,
-                              [source]: e.target.value
-                            }
-                          }, this._performPaletteSwaps);
-                        }}
-                      />
-                    </div>
-                  );
-                })
-            }
+          <div>
+            <div className="spritePane">
+              {/* Can't use this.state.baseImage directly because React /shrug */}
+              {
+                this.state.swappedImage && (
+                  <img src={this.state.swappedImage.src} />
+                )
+              }
+            </div>
+            <div className="colorPane">
+              {
+                Object.entries(this.state.colorMap)
+                  .map(([source, dest]) => {
+                    return (
+                      <div key={source}>
+                        <div className="swatch" style={{ backgroundColor: source }} />
+                        <input
+                          type="color"
+                          value={this.state.colorMap[source]}
+                          onChange={e => {
+                            this.setState({
+                              colorMap: {
+                                ...this.state.colorMap,
+                                [source]: e.target.value
+                              }
+                            }, this._performPaletteSwaps);
+                          }}
+                        />
+                      </div>
+                    );
+                  })
+              }
+            </div>
+            <button className="ok" onClick={() => this.props.onClose(this.state.colorMap)}>OK</button>
           </div>
         </div>
       );
@@ -74,9 +72,8 @@ window.jwb = window.jwb || {};
     }
 
     _performPaletteSwaps() {
-      this.setState({
-        swappedImage: replaceColors(this.state.baseImage, this.state.colorMap)
-      })
+      replaceColors(this.state.baseImage, this.state.colorMap)
+        .then(swappedImage => this.setState({ swappedImage }));
     }
   }
 }

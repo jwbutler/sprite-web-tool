@@ -1,9 +1,18 @@
 window.jwb = window.jwb || {};
 
 {
-  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, getShortFilename, replaceColors, isBehind, comparing } = window.jwb.utils;
+  const {
+    UNIT_DATA,
+    EQUIPMENT_DATA,
+    hasData,
+    getImageFilename,
+    getShortFilename,
+    replaceColors,
+    isBehind,
+    comparing
+  } = window.jwb.utils;
 
-  const UnitImage = ({ spriteName, activity, direction, frameNumber }) => (
+  const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }) => (
     <img
       className="hidden"
       src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
@@ -12,10 +21,11 @@ window.jwb = window.jwb || {};
       data-activity={activity}
       data-direction={direction}
       data-frameNumber={frameNumber}
+      data-paletteSwaps={JSON.stringify(paletteSwaps)}
     />
   );
 
-  const EquipmentImage = ({ spriteName, activity, direction, frameNumber }) => (
+  const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }) => (
     <img
       className="hidden"
       src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
@@ -26,6 +36,7 @@ window.jwb = window.jwb || {};
       data-activity={activity}
       data-direction={direction}
       data-frameNumber={frameNumber}
+      data-paletteSwaps={JSON.stringify(paletteSwaps)}
     />
   );
 
@@ -39,7 +50,7 @@ window.jwb = window.jwb || {};
     }
 
     render() {
-      const { unit, equipment, activity, direction, frameNumber, width, height } = this.props;
+      const { unit, equipment, activity, direction, frameNumber, paletteSwaps, width, height } = this.props;
       return (
         <span ref={e => this.container = e}>
           <UnitImage
@@ -47,6 +58,7 @@ window.jwb = window.jwb || {};
             activity={activity}
             direction={direction}
             frameNumber={frameNumber}
+            paletteSwaps={paletteSwaps[unit]}
           />
           {
             equipment.map(spriteName => (
@@ -55,6 +67,7 @@ window.jwb = window.jwb || {};
                 activity={activity}
                 direction={direction}
                 frameNumber={frameNumber}
+                paletteSwaps={paletteSwaps[spriteName]}
               />
             ))
           }
@@ -84,9 +97,30 @@ window.jwb = window.jwb || {};
         .sort((comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder)));
 
       const sortedImages = [...behindImages, unitImage, ...aheadImages];
-      sortedImages.forEach(image => {
-        image = replaceColors(image, { '#ff0000': [0, 0, 0, 0] });
-        context.drawImage(image, 0, 0);
+
+      /*sortedImages.forEach(image => {
+        if (canvas.width > 50) {
+          console.log(image.src, image.complete);
+        }
+        const paletteSwaps = JSON.parse(image.getAttribute('data-paletteSwaps')) || {};
+        paletteSwaps['#ff0000'] = [0, 0, 0, 0];
+        replaceColors(image, paletteSwaps)
+          .then(swappedImage => context.drawImage(swappedImage, 0, 0));
+      });*/
+
+      const drawPromises = sortedImages.map(image => {
+        const paletteSwaps = JSON.parse(image.getAttribute('data-paletteSwaps')) || {};
+        paletteSwaps['#ffffff'] = [0, 0, 0, 0];
+        return replaceColors(image, paletteSwaps);
+      });
+
+      Promise.all(drawPromises).then(swappedImages => {
+        swappedImages.forEach(swappedImage => {
+          if (canvas.width > 50) {
+            console.log(swappedImage.src, swappedImage.complete);
+          }
+          context.drawImage(swappedImage, 0, 0);
+        });
       });
 
       const compositeImage = canvas.toDataURL("image/png").split('base64,')[1];
@@ -112,7 +146,8 @@ window.jwb = window.jwb || {};
       const scaleX = (canvas.width / 40);
       const scaleY = (canvas.height / 40);
       context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-      context.fillStyle = '#ffffff';
+      //context.fillStyle = '#ffffff';
+      context.fillStyle = '#dddddd';
       context.fillRect(0, 0, canvas.width, canvas.height);
       const images = [...container.querySelectorAll('img')];
       images.forEach(image => {

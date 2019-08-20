@@ -140,33 +140,58 @@ window.jwb = window.jwb || {};
   };
 
   /**
+   * @private
+   */
+  const _zeroPad = (string, length) => {
+    while (string.length < length) {
+      string = `0${string}`;
+    }
+    return string;
+  };
+
+  const rgb2hex = (r, g, b) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
+
+  /**
+   * @param {String} hex e.g. '#abcdef'
+   * @return {Array<int>} [r, g, b, 255]
+   */
+  const hex2rgba = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b, 255];
+  };
+
+  /**
    * @param {HTMLImageElement} image
    * @param {Object} colorMap A map of (hex => hex) OR (hex => [r, g, b, a])
+   * @return Promise<HTMLImageElement>
    */
   const replaceColors = (image, colorMap) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    const context = canvas.getContext('2d');
-    context.drawImage(image, 0, 0);
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    Object.entries(colorMap).forEach(([source, dest]) => {
-      const sourceRGBA = hex2rgba(source);
-      const destRGBA = (dest[0] === '#' ? hex2rgba(dest) : dest);
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext('2d');
+      context.drawImage(image, 0, 0);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < imageData.data.length; i += 4) {
-        if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === sourceRGBA[j]))) {
-          [0, 1, 2, 3].forEach(j => {
-            imageData.data[i + j] = destRGBA[j];
-          });
-        }
+        Object.entries(colorMap).forEach(([source, dest]) => {
+          const sourceRGBA = hex2rgba(source);
+          if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === sourceRGBA[j]))) {
+            const destRGBA = (dest[0] === '#' ? hex2rgba(dest) : dest);
+            [0, 1, 2, 3].forEach(j => {
+              imageData.data[i + j] = destRGBA[j];
+            });
+          }
+        });
       }
+      context.putImageData(imageData, 0, 0);
+
+      const swappedImage = document.createElement('img');
+      swappedImage.src = canvas.toDataURL('image/png');
+      swappedImage.onload = () => resolve(swappedImage);
     });
-    context.putImageData(imageData, 0, 0);
-
-    const swappedImage = document.createElement('img');
-    swappedImage.src = canvas.toDataURL('image/png');
-    return swappedImage;
-
   };
 
   /**
@@ -196,29 +221,6 @@ window.jwb = window.jwb || {};
       zip.file(canvas.getAttribute('data-filename'), canvas.getAttribute('data-blob'), { base64: true });
     }
     return zip.generateAsync({ type: 'base64' });
-  };
-
-  /**
-   * @private
-   */
-  const _zeroPad = (string, length) => {
-    while (string.length < length) {
-      string = `0${string}`;
-    }
-    return string;
-  };
-
-  const rgb2hex = (r, g, b) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
-
-  /**
-   * @param {String} hex e.g. '#abcdef'
-   * @return {Array<int>} [r, g, b, 255]
-   */
-  const hex2rgba = (hex) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return [r, g, b, 255];
   };
 
   /**

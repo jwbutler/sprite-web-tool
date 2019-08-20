@@ -19,7 +19,10 @@ window.jwb = window.jwb || {};
         direction,
         frameNumber,
         equipment,
-        dataBlob: null
+        dataBlob: null,
+        paletteSwapModalSpriteName: null,
+        // spriteName -> (color -> color)
+        paletteSwaps: {}
       };
     }
 
@@ -61,6 +64,11 @@ window.jwb = window.jwb || {};
                     ))
                   }
                 </select>
+              </td>
+              <td>
+                <button onClick={() => this.showPaletteSwapModal(this.state.unit)}>
+                  Palette Swaps
+                </button>
               </td>
             </tr>
             {/* Render activity selection */}
@@ -156,7 +164,7 @@ window.jwb = window.jwb || {};
             </tr>
             {/* Render preview */}
             <tr>
-              <td colSpan="2">
+              <td colSpan="3">
                 <div>
                   Preview
                 </div>
@@ -167,6 +175,7 @@ window.jwb = window.jwb || {};
                     activity={this.state.activity}
                     direction={this.state.direction}
                     frameNumber={this.state.frameNumber}
+                    paletteSwaps={this.state.paletteSwaps}
                     width={160}
                     height={160}
                   />
@@ -175,7 +184,7 @@ window.jwb = window.jwb || {};
             </tr>
             {/* Render full sprite table */}
             <tr>
-              <td colSpan="2">
+              <td colSpan="3">
                 <div className="spriteSheet">
                   {
                     Object.entries(UNIT_DATA[this.state.unit].activities)
@@ -188,6 +197,7 @@ window.jwb = window.jwb || {};
                               activity={activity}
                               direction={direction}
                               frameNumber={frameNumber}
+                              paletteSwaps={this.state.paletteSwaps}
                               width={40}
                               height={40}
                             />
@@ -214,7 +224,17 @@ window.jwb = window.jwb || {};
               </td>
             </tr>
           </table>
-          <PaletteSwapModal spriteName="player" />
+          {
+            this.state.paletteSwapModalSpriteName && (
+              <PaletteSwapModal
+                spriteName={this.state.paletteSwapModalSpriteName}
+                onClose={colorMap => {
+                  this.updatePaletteSwaps(this.state.paletteSwapModalSpriteName, colorMap);
+                  this.setState({ paletteSwapModalSpriteName: null });
+                }}
+              />
+            )
+          }
         </div>
       );
     }
@@ -233,6 +253,19 @@ window.jwb = window.jwb || {};
         a.click();
         document.body.removeChild(a);
       })
+    }
+
+    showPaletteSwapModal(spriteName) {
+      this.setState({ paletteSwapModalSpriteName: spriteName });
+    }
+
+    updatePaletteSwaps(spriteName, colorMap) {
+      this.setState({
+        paletteSwaps: {
+          ...this.state.paletteSwaps,
+          [spriteName]: colorMap
+        }
+      });
     }
   }
 
