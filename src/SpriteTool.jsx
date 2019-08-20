@@ -64,8 +64,6 @@ window.jwb = window.jwb || {};
                     ))
                   }
                 </select>
-              </td>
-              <td>
                 <button onClick={() => this.showPaletteSwapModal(this.state.unit)}>
                   Palette Swaps
                 </button>

@@ -5,6 +5,9 @@
   border: 1px solid #ccc;
   padding: 10px;
 }
+.SpriteTool select {
+  margin-right: 20px;
+}
 .SpriteTool table table td,th {
   border: none;
   padding: 5px;

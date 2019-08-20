@@ -145,8 +145,7 @@ window.jwb = window.jwb || {};
       const scaleX = (canvas.width / 40);
       const scaleY = (canvas.height / 40);
       context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-      //context.fillStyle = '#ffffff';
-      context.fillStyle = '#dddddd';
+      context.fillStyle = '#ffffff';
       context.fillRect(0, 0, canvas.width, canvas.height);
       const images = [...container.querySelectorAll('img')];
       images.forEach(image => {
