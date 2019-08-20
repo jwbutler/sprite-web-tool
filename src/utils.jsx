@@ -4,7 +4,7 @@ window.jwb = window.jwb || {};
   const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const UNIT_DATA = {
     player: {
-      equipment: ['mail', 'sword', 'shield', 'shield2', 'shield3', 'hat', 'hat2', 'hairpiece', 'beard', 'helmet', 'helm2', 'spear', 'club', 'cloak'],
+      equipment: ['bow', 'beard', 'cloak', 'club', 'hat', 'hat2', 'helmet', 'helm2', 'mail', 'shield', 'shield2', 'shield3', 'sword'], // TODO SPEAR
       activities: {
         standing: {
           directions: DIRECTIONS,
@@ -39,6 +39,24 @@ window.jwb = window.jwb || {};
       },
       spriteDirectory: 'units/zombie',
     },
+    female: {
+      equipment: ['sword_female', 'skirt'],
+      activities: {
+        standing: {
+          directions: DIRECTIONS,
+          frameNumbers: [1]
+        },
+        walking: {
+          directions: DIRECTIONS,
+          frameNumbers: [1, 2]
+        },
+        attacking: {
+          directions: DIRECTIONS,
+          frameNumbers: [1, 2, '2b']
+        }
+      },
+      spriteDirectory: 'units/female'
+    }
     /*robed_wizard: {
       equipment: [],
       activities: {
@@ -56,25 +74,21 @@ window.jwb = window.jwb || {};
   };
 
   const EQUIPMENT_DATA = {
-    mail: {
-      spriteDirectory: 'equipment/mail',
-      drawOrder: 0,
+    beard: {
+      spriteDirectory: 'equipment/beard',
+      drawOrder: 3,
     },
-    sword: {
-      spriteDirectory: 'equipment/sword',
+    bow: {
+      spriteDirectory: 'equipment/bow',
       drawOrder: 1,
     },
-    shield: {
-      spriteDirectory: 'equipment/shield',
-      drawOrder: 2,
+    cloak: {
+      spriteDirectory: 'equipment/cloak',
+      drawOrder: 0,
     },
-    shield2: {
-      spriteDirectory: 'equipment/shield2',
-      drawOrder: 2,
-    },
-    shield3: {
-      spriteDirectory: 'equipment/shield3',
-      drawOrder: 2,
+    club: {
+      spriteDirectory: 'equipment/club',
+      drawOrder: 1,
     },
     hat: {
       spriteDirectory: 'equipment/hat',
@@ -92,25 +106,37 @@ window.jwb = window.jwb || {};
       spriteDirectory: 'equipment/helm2',
       drawOrder: 4,
     },
+    mail: {
+      spriteDirectory: 'equipment/mail',
+      drawOrder: 0,
+    },
+    shield: {
+      spriteDirectory: 'equipment/shield',
+      drawOrder: 2,
+    },
+    shield2: {
+      spriteDirectory: 'equipment/shield2',
+      drawOrder: 2,
+    },
+    shield3: {
+      spriteDirectory: 'equipment/shield3',
+      drawOrder: 2,
+    },
+    skirt: {
+      spriteDirectory: 'equipment/skirt',
+      drawOrder: 0,
+    },
     spear: {
       spriteDirectory: 'equipment/spear',
       drawOrder: 1,
     },
-    club: {
-      spriteDirectory: 'equipment/club',
+    sword: {
+      spriteDirectory: 'equipment/sword',
       drawOrder: 1,
     },
-    cloak: {
-      spriteDirectory: 'equipment/cloak',
-      drawOrder: 0,
-    },
-    hairpiece: {
-      spriteDirectory: 'equipment/hat',
-      drawOrder: 3,
-    },
-    beard: {
-      spriteDirectory: 'equipment/beard',
-      drawOrder: 3,
+    sword_female: {
+      spriteDirectory: 'equipment/sword_female',
+      drawOrder: 1,
     }
   };
 
