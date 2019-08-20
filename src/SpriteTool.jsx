@@ -155,6 +155,11 @@ window.jwb = window.jwb || {};
                               key={item}
                             />
                           </td>
+                          <td>
+                            <button onClick={() => this.showPaletteSwapModal(item)}>
+                              Palette Swaps
+                            </button>
+                          </td>
                         </tr>
                       );
                     })
@@ -228,7 +233,7 @@ window.jwb = window.jwb || {};
             this.state.paletteSwapModalSpriteName && (
               <PaletteSwapModal
                 spriteName={this.state.paletteSwapModalSpriteName}
-                onClose={colorMap => {
+                onClose={(colorMap) => {
                   this.updatePaletteSwaps(this.state.paletteSwapModalSpriteName, colorMap);
                   this.setState({ paletteSwapModalSpriteName: null });
                 }}

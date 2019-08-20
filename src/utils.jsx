@@ -211,7 +211,7 @@ window.jwb = window.jwb || {};
   const comparing = (keyFunction) => ((a, b) => keyFunction(a) - keyFunction(b));
 
   /**
-   * @returns {Promise<Blob>}
+   * @returns {Promise<String>}
    */
   const generateDownloadLink = () => {
     const canvases = document.querySelectorAll('canvas[data-blob][data-filename]');

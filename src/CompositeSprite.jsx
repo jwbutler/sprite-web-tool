@@ -121,13 +121,12 @@ window.jwb = window.jwb || {};
           }
           context.drawImage(swappedImage, 0, 0);
         });
+
+        const compositeImage = canvas.toDataURL("image/png").split('base64,')[1];
+        const outputFilename = getShortFilename(unit, activity, direction, frameNumber);
+
+        this.setState({ compositeImage, outputFilename });
       });
-
-      const compositeImage = canvas.toDataURL("image/png").split('base64,')[1];
-      const outputFilename = getShortFilename(unit, activity, direction, frameNumber);
-
-      this.setState({ compositeImage, outputFilename });
-
     };
 
     onImageLoad(image) {
