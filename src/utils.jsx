@@ -211,13 +211,15 @@ window.jwb = window.jwb || {};
         .map(([source, dest]) => [hex2rgba(source), dest[0] === '#' ? hex2rgba(dest) : dest]);
 
       for (let i = 0; i < imageData.data.length; i += 4) {
-        rgbaSwaps.forEach(([source, dest]) => {
+        for (let j = 0; j < rgbaSwaps.length; j++) {
+          const [source, dest] = rgbaSwaps[j];
           if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === source[j]))) {
             [0, 1, 2, 3].forEach(j => {
               imageData.data[i + j] = dest[j];
             });
+            break;
           }
-        });
+        }
       }
       context.putImageData(imageData, 0, 0);
 
