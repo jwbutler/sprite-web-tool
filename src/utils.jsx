@@ -198,20 +198,23 @@ window.jwb = window.jwb || {};
    * @return Promise<HTMLImageElement>
    */
   const replaceColors = (image, colorMap) => {
+    const t1 = new Date().getTime();
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
-      const context = canvas.getContext('2d');
+      const context = canvas.getContext('2d', {});
       context.drawImage(image, 0, 0);
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+      const rgbaSwaps = Object.entries(colorMap)
+        .map(([source, dest]) => [hex2rgba(source), dest[0] === '#' ? hex2rgba(dest) : dest]);
+
       for (let i = 0; i < imageData.data.length; i += 4) {
-        Object.entries(colorMap).forEach(([source, dest]) => {
-          const sourceRGBA = hex2rgba(source);
-          if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === sourceRGBA[j]))) {
-            const destRGBA = (dest[0] === '#' ? hex2rgba(dest) : dest);
+        rgbaSwaps.forEach(([source, dest]) => {
+          if ([0, 1, 2, 3].every(j => (imageData.data[i + j] === source[j]))) {
             [0, 1, 2, 3].forEach(j => {
-              imageData.data[i + j] = destRGBA[j];
+              imageData.data[i + j] = dest[j];
             });
           }
         });
@@ -220,7 +223,11 @@ window.jwb = window.jwb || {};
 
       const swappedImage = document.createElement('img');
       swappedImage.src = canvas.toDataURL('image/png');
-      swappedImage.onload = () => resolve(swappedImage);
+      swappedImage.onload = () => {
+        const t2 = new Date().getTime();
+        //console.log('SWAP: ' + (t2 - t1));
+        resolve(swappedImage);
+      };
     });
   };
 
@@ -257,6 +264,7 @@ window.jwb = window.jwb || {};
    * TODO: Assumes that any one frame will have all the colors for every animation.
    *
    * @param {HTMLImageElement} image
+   * @return Array<String>
    */
   const getImageColors = (image) => {
     const colors = {};
@@ -304,6 +312,23 @@ window.jwb = window.jwb || {};
     })
   };
 
+  const arrayEquals = (first, second) => {
+    return (
+      first.every(e => second.indexOf(e) > -1)
+      && second.every(e => first.indexOf(e) > -1)
+    );
+  };
+
+  /**
+   * Still pretty shallow
+   */
+  const objectEquals = (first, second) => {
+    return (
+      Object.entries(first).every(([k, v]) => second[k] === v)
+      && Object.entries(second).every(([k, v]) => first[k] === v)
+    );
+  };
+
   window.jwb.utils = {
     UNIT_DATA,
     EQUIPMENT_DATA,
@@ -317,6 +342,8 @@ window.jwb = window.jwb || {};
     getAnyFrame,
     getImageColors,
     rgb2hex,
-    hex2rgba
+    hex2rgba,
+    arrayEquals,
+    objectEquals
   };
 }

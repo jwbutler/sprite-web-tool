@@ -1,16 +1,18 @@
+.SpriteTool {
+  display: flex;
+}
+.SpriteTool * {
+  box-sizing: border-box;
+}
 .SpriteTool table {
   border-collapse: collapse;
+}
+.SpriteTool table.mainTable {
+  width: 600px;
 }
 .SpriteTool table td,th {
   border: 1px solid #ccc;
   padding: 10px;
-}
-.SpriteTool select {
-  margin-right: 20px;
-}
-.SpriteTool table table td,th {
-  border: none;
-  padding: 5px;
 }
 .SpriteTool .preview {
   text-align: center;

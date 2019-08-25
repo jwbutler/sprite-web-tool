@@ -1,7 +1,8 @@
 window.jwb = window.jwb || {};
 
 {
-  const { UNIT_DATA, EQUIPMENT_DATA, hasData, getImageFilename, replaceColor, isBehind, comparing, generateDownloadLink } = window.jwb.utils;
+  const { EquipmentTable, PaletteSwapPanel } = window.jwb;
+  const { UNIT_DATA, EQUIPMENT_DATA } = window.jwb.utils;
 
   class SpriteTool extends React.PureComponent {
     constructor(props) {
@@ -20,7 +21,6 @@ window.jwb = window.jwb || {};
         frameNumber,
         equipment,
         dataBlob: null,
-        paletteSwapModalSpriteName: null,
         // spriteName -> (color -> color)
         paletteSwaps: {}
       };
@@ -46,7 +46,7 @@ window.jwb = window.jwb || {};
     render() {
       return (
         <div className="SpriteTool">
-          <table>
+          <table className="mainTable">
             {/* Render unit selection */}
             <tr>
               <td>
@@ -64,9 +64,6 @@ window.jwb = window.jwb || {};
                     ))
                   }
                 </select>
-                <button onClick={() => this.showPaletteSwapModal(this.state.unit)}>
-                  Palette Swaps
-                </button>
               </td>
             </tr>
             {/* Render activity selection */}
@@ -134,41 +131,17 @@ window.jwb = window.jwb || {};
                 </label>
               </td>
               <td>
-                <table>
-                {
-                  UNIT_DATA[this.state.unit].equipment.sort()
-                    .map(item => {
-                      return (
-                        <tr>
-                          <td>
-                            {item}
-                          </td>
-                          <td>
-                            <input
-                              type="checkbox"
-                              name="equipment"
-                              value={item}
-                              checked={this.state.equipment.indexOf(item) > -1}
-                              onChange={e => this.onChange(e)}
-                              key={item}
-                            />
-                          </td>
-                          <td>
-                            <button onClick={() => this.showPaletteSwapModal(item)}>
-                              Palette Swaps
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                }
-                </table>
+                <EquipmentTable
+                  equipment={UNIT_DATA[this.state.unit].equipment}
+                  enabledEquipment={this.state.equipment}
+                  onChange = {e => this.onChange(e)}
+                />
               </td>
             </tr>
-            {/* Render preview */}
             <tr>
-              <td colSpan="3">
-                <div>
+              {/* Render preview */}
+              <td>
+                <div className="title">
                   Preview
                 </div>
                 <div className="preview">
@@ -181,19 +154,31 @@ window.jwb = window.jwb || {};
                     paletteSwaps={this.state.paletteSwaps}
                     width={160}
                     height={160}
+                    onChange={e => this.onChange(e)}
                   />
                 </div>
+              </td>
+              {/* Render palette swap panel */}
+              <td>
+                <PaletteSwapPanel
+                  spriteNames={this._getEnabledSpriteNames()}
+                  paletteSwaps={this.state.paletteSwaps}
+                  onChange={e => this.onChange(e)}
+                />
               </td>
             </tr>
             {/* Render full sprite table */}
             <tr>
-              <td colSpan="3">
+              <td colSpan="2">
+                <div className="title">
+                  Palette Swaps
+                </div>
                 <div className="spriteSheet">
                   {
                     Object.entries(UNIT_DATA[this.state.unit].activities)
                       .map(([activity, { directions, frameNumbers }]) =>
                         frameNumbers.map(frameNumber =>
-                          directions.map(direction =>
+                          directions.map(direction => (
                             <CompositeSprite
                               unit={this.state.unit}
                               equipment={this.state.equipment}
@@ -204,7 +189,7 @@ window.jwb = window.jwb || {};
                               width={40}
                               height={40}
                             />
-                          )
+                          ))
                         )
                       )
                   }
@@ -227,22 +212,13 @@ window.jwb = window.jwb || {};
               </td>
             </tr>
           </table>
-          {
-            this.state.paletteSwapModalSpriteName && (
-              <PaletteSwapModal
-                spriteName={this.state.paletteSwapModalSpriteName}
-                onClose={(colorMap) => {
-                  this.updatePaletteSwaps(this.state.paletteSwapModalSpriteName, colorMap);
-                  this.setState({ paletteSwapModalSpriteName: null });
-                }}
-              />
-            )
-          }
         </div>
       );
     }
 
     downloadZip() {
+      const { generateDownloadLink } = window.jwb.utils;
+
       generateDownloadLink().then(content => {
         const dataLink = "data:application/zip;base64," + content;
 
@@ -258,10 +234,6 @@ window.jwb = window.jwb || {};
       })
     }
 
-    showPaletteSwapModal(spriteName) {
-      this.setState({ paletteSwapModalSpriteName: spriteName });
-    }
-
     updatePaletteSwaps(spriteName, colorMap) {
       this.setState({
         paletteSwaps: {
@@ -270,7 +242,11 @@ window.jwb = window.jwb || {};
         }
       });
     }
+
+    _getEnabledSpriteNames = () => {
+      return [this.state.unit, ...this.state.equipment];
+    };
   }
 
-  window.jwb = { SpriteTool };
+  window.jwb.SpriteTool = SpriteTool;
 }
