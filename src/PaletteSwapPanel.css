@@ -1,17 +1,24 @@
-.PaletteSwapPanel {
-  width: 72px;
-}
-
 .PaletteSwapPanel select {
-  margin: 0;
+  margin: 0 0 20px;
   padding: 4px 8px;
-  width: 100%;
 }
 
-.PaletteSwapPanel .row {
+.PaletteSwapPanel .table {
   display: flex;
-  justify-content: space-between;
-  margin: 8px 0;
+  flex-direction: column;
+  max-height: 200px;
+  flex-wrap: wrap;
+}
+
+.PaletteSwapPanel .table .row {
+  text-align: center;
+  border: 1px solid #cccccc;
+  margin: 2px;
+}
+
+.PaletteSwapPanel .table .col {
+  display: inline-block;
+  padding: 5px;
 }
 
 .PaletteSwapPanel .swatch {

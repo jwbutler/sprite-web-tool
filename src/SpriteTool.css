@@ -1,5 +1,6 @@
 .SpriteTool {
   display: flex;
+  font-family: Arial;
 }
 .SpriteTool * {
   box-sizing: border-box;
@@ -8,17 +9,32 @@
   border-collapse: collapse;
 }
 .SpriteTool table.mainTable {
-  width: 600px;
+  width: 700px;
 }
 .SpriteTool table td,th {
-  border: 1px solid #ccc;
+  border: 1px solid #cccccc;
   padding: 10px;
+  vertical-align: top;
+}
+.SpriteTool table td:first-child,th:first-child {
+  width: 160px;
+}
+.SpriteTool select {
+  min-width: 100%;
+}
+.SpriteTool .title {
+  text-align: center;
+  font-weight: bold;
+  margin: 0 0 20px;
 }
 .SpriteTool .preview {
   text-align: center;
 }
 .SpriteTool .preview img {
   display: none;
+}
+.SpriteTool .spriteSheet {
+  text-align: center;
 }
 .SpriteTool .spriteSheet img.hidden {
   display: none;

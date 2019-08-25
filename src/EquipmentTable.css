@@ -1,4 +1,18 @@
-.EquipmentTable table td,th {
-  border: none;
-  padding: 5px;
+.EquipmentTable {
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  flex-wrap: wrap;
+}
+
+.EquipmentTable .row {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #cccccc;
+  margin: 2px;
+}
+
+.EquipmentTable .col {
+  display: inline-block;
+  width: 50%;
 }

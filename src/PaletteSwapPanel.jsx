@@ -25,7 +25,6 @@
       const { spriteNames, paletteSwaps, onChange } = this.props;
       const { spriteName } = this.state;
       const spritePaletteSwaps = paletteSwaps[spriteName] || {};
-      console.log(paletteSwaps);
 
       return (
         <div className="PaletteSwapPanel">
@@ -38,23 +37,28 @@
               ))
             }
           </select>
-
-          {
-            Object.entries(spritePaletteSwaps)
-              .filter(([source, dest]) => source !== '#ffffff')
-              .map(([source, dest]) => (
-                <div className="row" key={source}>
-                  <div className="swatch" style={{ backgroundColor: source }} />
-                  <input
-                    type="color"
-                    value={spritePaletteSwaps[source]}
-                    onChange={e => {
-                      this._onChangePaletteSwaps(source, e.target.value);
-                    }}
-                  />
-                </div>
-              ))
-          }
+          <div className="table">
+            {
+              Object.entries(spritePaletteSwaps)
+                .filter(([source, dest]) => source !== '#ffffff')
+                .map(([source, dest]) => (
+                  <div className="row" key={source}>
+                    <div className="col">
+                      <div className="swatch" style={{ backgroundColor: source }} />
+                    </div>
+                    <div className="col">
+                      <input
+                        type="color"
+                        value={spritePaletteSwaps[source]}
+                        onChange={e => {
+                          this._onChangePaletteSwaps(source, e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))
+            }
+          </div>
         </div>
       );
     }

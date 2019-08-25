@@ -50,7 +50,8 @@ window.jwb = window.jwb || {};
    *   paletteSwaps: Object<string, string>,
    *   width: number,
    *   height: number,
-   *   onChange: function(event): void
+   *   onChange: function(event): void,
+   *   onImageLoaded: ?function(string, string): void
    * }}
    */
   let Props;
@@ -61,11 +62,6 @@ window.jwb = window.jwb || {};
      */
     constructor(props) {
       super(props);
-
-      this.state = {
-        compositeImage: null,
-        outputFilename: null
-      };
     }
 
     render() {
@@ -90,15 +86,10 @@ window.jwb = window.jwb || {};
               />
             ))
           }
-          <span className="metadata">
-
-          </span>
           <canvas
             width={width}
             height={height}
             ref={canvas => { this.canvas = canvas; }}
-            data-blob={this.state.compositeImage}
-            data-filename={this.state.outputFilename}
           />
         </span>
       );
@@ -109,7 +100,7 @@ window.jwb = window.jwb || {};
         image.onload = () => this._onImageLoaded(image);
         image.src = image.getAttribute('data-behind');
       } else {
-        if (this._getImages().every(i => i.complete)) {
+        if (this._getImages().every(i => i.complete || true)) {
           this._drawImages();
         }
       }
@@ -118,7 +109,7 @@ window.jwb = window.jwb || {};
     _drawImages() {
       const { getImageColors } = window.jwb.utils;
       const { canvas, container } = this;
-      const { unit,  activity, direction, frameNumber, paletteSwaps, onChange } = this.props;
+      const { unit,  activity, direction, frameNumber, paletteSwaps, onChange, onImageLoaded } = this.props;
 
       const context = canvas.getContext('2d');
       const images = [...container.querySelectorAll('img.hidden')]
@@ -168,10 +159,9 @@ window.jwb = window.jwb || {};
           context.drawImage(swappedImage, 0, 0);
         });
 
-        const compositeImage = canvas.toDataURL('image/png').split('base64,')[1];
+        const imageBlob = canvas.toDataURL('image/png').split('base64,')[1];
         const outputFilename = getShortFilename(unit, activity, direction, frameNumber);
-
-        this.setState({ compositeImage, outputFilename });
+        onImageLoaded && onImageLoaded(outputFilename, imageBlob);
       });
     };
 
@@ -199,12 +189,10 @@ window.jwb = window.jwb || {};
 
     componentDidMount() {
       this._renderCanvas();
-      (this.props.width > 50) && console.log('mount ' + new Date().getTime());
     }
 
     componentDidUpdate() {
       this._renderCanvas();
-      (this.props.width > 50) && console.log('update ' + new Date().getTime());
     }
   }
 

@@ -248,15 +248,14 @@ window.jwb = window.jwb || {};
   const comparing = (keyFunction) => ((a, b) => keyFunction(a) - keyFunction(b));
 
   /**
+   * @param {Object<string, string>} filenameToBlob
    * @returns {Promise<String>}
    */
-  const generateDownloadLink = () => {
-    const canvases = document.querySelectorAll('canvas[data-blob][data-filename]');
+  const generateDownloadLink = (filenameToBlob) => {
     const zip = new JSZip();
-    for (let i = 0; i < canvases.length; i++) {
-      const canvas = canvases[i];
-      zip.file(canvas.getAttribute('data-filename'), canvas.getAttribute('data-blob'), { base64: true });
-    }
+    Object.entries(filenameToBlob).forEach(([filename, blob]) =>{
+      zip.file(filename, blob, { base64: true });
+    });
     return zip.generateAsync({ type: 'base64' });
   };
 

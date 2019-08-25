@@ -1,15 +1,14 @@
 {
   const EquipmentTable = ({equipment, enabledEquipment, onChange}) => (
     <div className="EquipmentTable">
-      <table>
-        {
-          equipment.sort()
+      {
+        equipment.sort()
           .map(item => (
-            <tr>
-              <td>
+            <div className="row">
+              <div className="col">
                 {item}
-              </td>
-              <td>
+                </div>
+              <div className="col">
                 <input
                   type="checkbox"
                   name="equipment"
@@ -18,11 +17,10 @@
                   onChange={e => onChange(e)}
                   key={item}
                 />
-              </td>
-            </tr>
+              </div>
+            </div>
           ))
-        }
-      </table>
+      }
     </div>
   );
 

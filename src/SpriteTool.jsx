@@ -21,6 +21,7 @@ window.jwb = window.jwb || {};
         frameNumber,
         equipment,
         dataBlob: null,
+        filenameToBlob: {},
         // spriteName -> (color -> color)
         paletteSwaps: {}
       };
@@ -66,63 +67,6 @@ window.jwb = window.jwb || {};
                 </select>
               </td>
             </tr>
-            {/* Render activity selection */}
-            <tr>
-              <td>
-                <label htmlFor="activity">
-                  Activity
-                </label>
-              </td>
-              <td>
-                <select name="activity" onChange={e => this.onChange(e)}>
-                  {
-                    Object.keys(UNIT_DATA[this.state.unit].activities).map(activity => (
-                      <option name={activity} key={activity}>
-                        {activity}
-                      </option>
-                    ))
-                  }
-                </select>
-              </td>
-            </tr>
-            {/* Render direction selection */}
-            <tr>
-              <td>
-                <label htmlFor="direction">
-                  Direction
-                </label>
-              </td>
-              <td>
-                <select name="direction" onChange={e => this.onChange(e)}>
-                  {
-                    UNIT_DATA[this.state.unit].activities[this.state.activity].directions.map(direction => (
-                      <option name={direction} key={direction}>
-                        {direction}
-                      </option>
-                    ))
-                  }
-                </select>
-              </td>
-            </tr>
-            {/* Render frame number selection */}
-            <tr>
-              <td>
-                <label htmlFor="frameNumber">
-                  Frame Number
-                </label>
-              </td>
-              <td>
-                <select name="frameNumber" onChange={e => this.onChange(e)}>
-                  {
-                    UNIT_DATA[this.state.unit].activities[this.state.activity].frameNumbers.map(frameNumber => (
-                      <option name={frameNumber} key={frameNumber}>
-                        {frameNumber}
-                      </option>
-                    ))
-                  }
-                </select>
-              </td>
-            </tr>
             {/* Render equipment selection table */}
             <tr>
               <td>
@@ -157,9 +101,69 @@ window.jwb = window.jwb || {};
                     onChange={e => this.onChange(e)}
                   />
                 </div>
+                {/* Render activity selection */}
+                <tr>
+                  <td>
+                    <label htmlFor="activity">
+                      Activity
+                    </label>
+                  </td>
+                  <td>
+                    <select name="activity" onChange={e => this.onChange(e)}>
+                      {
+                        Object.keys(UNIT_DATA[this.state.unit].activities).map(activity => (
+                          <option name={activity} key={activity}>
+                            {activity}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </td>
+                </tr>
+                {/* Render direction selection */}
+                <tr>
+                  <td>
+                    <label htmlFor="direction">
+                      Direction
+                    </label>
+                  </td>
+                  <td>
+                    <select name="direction" onChange={e => this.onChange(e)}>
+                      {
+                        UNIT_DATA[this.state.unit].activities[this.state.activity].directions.map(direction => (
+                          <option name={direction} key={direction}>
+                            {direction}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </td>
+                </tr>
+                {/* Render frame number selection */}
+                <tr>
+                  <td>
+                    <label htmlFor="frameNumber">
+                      Frame Number
+                    </label>
+                  </td>
+                  <td>
+                    <select name="frameNumber" onChange={e => this.onChange(e)}>
+                      {
+                        UNIT_DATA[this.state.unit].activities[this.state.activity].frameNumbers.map(frameNumber => (
+                          <option name={frameNumber} key={frameNumber}>
+                            {frameNumber}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </td>
+                </tr>
               </td>
               {/* Render palette swap panel */}
               <td>
+                <div className="title">
+                  Palette Swaps
+                </div>
                 <PaletteSwapPanel
                   spriteNames={this._getEnabledSpriteNames()}
                   paletteSwaps={this.state.paletteSwaps}
@@ -171,7 +175,7 @@ window.jwb = window.jwb || {};
             <tr>
               <td colSpan="2">
                 <div className="title">
-                  Palette Swaps
+                  Sprite Sheet
                 </div>
                 <div className="spriteSheet">
                   {
@@ -186,6 +190,14 @@ window.jwb = window.jwb || {};
                               direction={direction}
                               frameNumber={frameNumber}
                               paletteSwaps={this.state.paletteSwaps}
+                              onImageLoaded={(filename, blob) => {
+                                const { filenameToBlob } = this.state;
+                                filenameToBlob[filename] = blob;
+                                this.setState({
+                                  ...this.state,
+                                  filenameToBlob
+                                });
+                              }}
                               width={40}
                               height={40}
                             />
@@ -219,7 +231,7 @@ window.jwb = window.jwb || {};
     downloadZip() {
       const { generateDownloadLink } = window.jwb.utils;
 
-      generateDownloadLink().then(content => {
+      generateDownloadLink(this.state.filenameToBlob).then(content => {
         const dataLink = "data:application/zip;base64," + content;
 
         // SUUUUUPER HACK ALERT
@@ -232,15 +244,6 @@ window.jwb = window.jwb || {};
         a.click();
         document.body.removeChild(a);
       })
-    }
-
-    updatePaletteSwaps(spriteName, colorMap) {
-      this.setState({
-        paletteSwaps: {
-          ...this.state.paletteSwaps,
-          [spriteName]: colorMap
-        }
-      });
     }
 
     _getEnabledSpriteNames = () => {
