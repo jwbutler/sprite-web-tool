@@ -101,7 +101,9 @@ window.jwb = window.jwb || {};
         this.loadedImages.push(image);
       }
 
-      if (this._getImages().every(i => this.loadedImages.indexOf(i) > -1)) {
+      if (this._getImages().every(i =>
+        i.complete && this.loadedImages.indexOf(i) > -1
+      )) {
         this._drawImages();
       }
     }
@@ -114,7 +116,7 @@ window.jwb = window.jwb || {};
       const context = canvas.getContext('2d');
       context.fillStyle = '#ffffff';
       context.fillRect(0, 0, canvas.width, canvas.height);
-      
+
       const images = [...container.querySelectorAll('img.hidden')];
 
       const behindImages = images.filter(image => isBehind(image))
