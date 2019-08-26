@@ -63,6 +63,24 @@
       );
     }
 
+    componentDidMount() {
+      const { spriteName } = this.state;
+      const { spriteNames } = this.props;
+      if (spriteNames.indexOf(spriteName) === -1) {
+        this.setState({ spriteName: spriteNames[0] });
+        console.log(spriteNames[0]);
+      }
+    }
+
+    componentDidUpdate() {
+      const { spriteName } = this.state;
+      const { spriteNames } = this.props;
+      if (spriteNames.indexOf(spriteName) === -1) {
+        this.setState({ spriteName: spriteNames[0] });
+        console.log(spriteNames[0]);
+      }
+    }
+
     _onChangePaletteSwaps(source, dest) {
       const { spriteName } = this.state;
       const paletteSwaps = { ... this.props.paletteSwaps };

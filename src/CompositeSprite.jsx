@@ -4,7 +4,6 @@ window.jwb = window.jwb || {};
   const {
     UNIT_DATA,
     EQUIPMENT_DATA,
-    hasData,
     getImageFilename,
     getShortFilename,
     replaceColors,
@@ -25,12 +24,12 @@ window.jwb = window.jwb || {};
     />
   );
 
-  const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }) => (
+  const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps, onError }) => (
     <img
       className="hidden"
       src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
       key={spriteName}
-      onError={e => { e.target.src = e.target.getAttribute('data-behind'); }}
+      onError={e => onError(e)}
       data-behind={getImageFilename(spriteName, activity, direction, frameNumber, true)}
       data-spriteName={spriteName}
       data-activity={activity}
@@ -62,6 +61,7 @@ window.jwb = window.jwb || {};
      */
     constructor(props) {
       super(props);
+      this.loadedImages = [];
     }
 
     render() {
@@ -83,6 +83,7 @@ window.jwb = window.jwb || {};
                 direction={direction}
                 frameNumber={frameNumber}
                 paletteSwaps={paletteSwaps[spriteName]}
+                onError={e => this._swapToBehindImage(e)}
               />
             ))
           }
@@ -96,13 +97,12 @@ window.jwb = window.jwb || {};
     }
 
     _onImageLoaded(image) {
-      if (!hasData(image)) {
-        image.onload = () => this._onImageLoaded(image);
-        image.src = image.getAttribute('data-behind');
-      } else {
-        if (this._getImages().every(i => i.complete || true)) {
-          this._drawImages();
-        }
+      if (this.loadedImages.indexOf(image) === -1) {
+        this.loadedImages.push(image);
+      }
+
+      if (this._getImages().every(i => this.loadedImages.indexOf(i) > -1)) {
+        this._drawImages();
       }
     }
 
@@ -112,8 +112,10 @@ window.jwb = window.jwb || {};
       const { unit,  activity, direction, frameNumber, paletteSwaps, onChange, onImageLoaded } = this.props;
 
       const context = canvas.getContext('2d');
-      const images = [...container.querySelectorAll('img.hidden')]
-        .filter(image => hasData(image, canvas, context));
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const images = [...container.querySelectorAll('img.hidden')];
 
       const behindImages = images.filter(image => isBehind(image))
         .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
@@ -123,6 +125,7 @@ window.jwb = window.jwb || {};
         .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
 
       const sortedImages = [...behindImages, unitImage, ...aheadImages];
+      this.props.width > 50 && console.log('sortedImages=' + sortedImages.map(i => i.getAttribute('data-spriteName')));
 
       const updatedPaletteSwaps = {...paletteSwaps};
       let arePaletteSwapsUpdated = false;
@@ -170,14 +173,15 @@ window.jwb = window.jwb || {};
     }
 
     _renderCanvas() {
+      this.loadedImages = [];
+
       const { canvas } = this;
       const context = canvas.getContext('2d');
+
       context.imageSmoothingEnabled = false;
       const scaleX = (canvas.width / 40);
       const scaleY = (canvas.height / 40);
       context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
       this._getImages().forEach(image => {
         if (image.complete) {
           this._onImageLoaded(image);
@@ -187,12 +191,20 @@ window.jwb = window.jwb || {};
       }, this);
     };
 
+    _swapToBehindImage(e) {
+      //e.target.onload = () => this._onImageLoaded(e.target);
+      e.target.src = e.target.getAttribute('data-behind');
+      this._renderCanvas();
+    };
+
     componentDidMount() {
       this._renderCanvas();
+      this.props.width > 50 && console.log('mount');
     }
 
     componentDidUpdate() {
       this._renderCanvas();
+      this.props.width > 50 && console.log('update');
     }
   }
 

@@ -227,7 +227,6 @@ window.jwb = window.jwb || {};
       swappedImage.src = canvas.toDataURL('image/png');
       swappedImage.onload = () => {
         const t2 = new Date().getTime();
-        //console.log('SWAP: ' + (t2 - t1));
         resolve(swappedImage);
       };
     });
