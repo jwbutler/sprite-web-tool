@@ -127,7 +127,6 @@ window.jwb = window.jwb || {};
         .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
 
       const sortedImages = [...behindImages, unitImage, ...aheadImages];
-      this.props.width > 50 && console.log('sortedImages=' + sortedImages.map(i => i.getAttribute('data-spriteName')));
 
       const updatedPaletteSwaps = {...paletteSwaps};
       let arePaletteSwapsUpdated = false;
@@ -194,19 +193,16 @@ window.jwb = window.jwb || {};
     };
 
     _swapToBehindImage(e) {
-      //e.target.onload = () => this._onImageLoaded(e.target);
       e.target.src = e.target.getAttribute('data-behind');
       this._renderCanvas();
     };
 
     componentDidMount() {
       this._renderCanvas();
-      this.props.width > 50 && console.log('mount');
     }
 
     componentDidUpdate() {
       this._renderCanvas();
-      this.props.width > 50 && console.log('update');
     }
   }
 

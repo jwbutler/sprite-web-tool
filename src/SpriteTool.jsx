@@ -29,19 +29,28 @@ window.jwb = window.jwb || {};
 
     onChange(e) {
       const field = e.target.name;
-      const value = e.target.value;
+      const eventValue = e.target.value;
+      let value;
       if (e.target.type === 'checkbox') {
-        const fieldValue = [...this.state[field]];
-        const index = fieldValue.indexOf(value);
+        value = [...this.state[field]];
+        const index = value.indexOf(eventValue);
         if (index > -1) {
-          fieldValue.splice(index, 1);
+          value.splice(index, 1);
         } else {
-          fieldValue.push(value);
+          value.push(eventValue);
         }
-        this.setState({ [field]: fieldValue });
       } else {
-        this.setState({ [field]: value });
+        value = eventValue;
       }
+
+      const updatedState = {
+        ...this.state,
+        [field]: value
+      };
+
+      updatedState.equipment = updatedState.equipment.filter(item => UNIT_DATA[updatedState.unit].equipment.indexOf(item) > -1);
+
+      this.setState(updatedState);
     }
 
     render() {

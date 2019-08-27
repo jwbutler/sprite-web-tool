@@ -34,7 +34,7 @@ window.jwb = window.jwb || {};
         },
         attacking: {
           directions: DIRECTIONS,
-          frameNumbers: [1, 2, '2b']
+          frameNumbers: [1, 2]
         }
       },
       spriteDirectory: 'units/zombie',
