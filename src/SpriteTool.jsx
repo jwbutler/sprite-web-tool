@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './SpriteTool.css';
+import styles from './SpriteTool.css';
 import { generateDownloadLink, UNIT_DATA } from './utils';
 import EquipmentTable from './EquipmentTable';
 import CompositeSprite from './CompositeSprite';
@@ -57,8 +57,8 @@ class SpriteTool extends React.PureComponent {
 
   render() {
     return (
-      <div className="SpriteTool">
-        <table className="mainTable">
+      <div className={styles.SpriteTool}>
+        <table className={styles.mainTable}>
           {/* Render unit selection */}
           <tr>
             <td>
@@ -96,10 +96,10 @@ class SpriteTool extends React.PureComponent {
           <tr>
             {/* Render preview */}
             <td>
-              <div className="title">
+              <div className={styles.title}>
                 Preview
               </div>
-              <div className="preview">
+              <div className={styles.preview}>
                 <CompositeSprite
                   unit={this.state.unit}
                   equipment={this.state.equipment}
@@ -172,7 +172,7 @@ class SpriteTool extends React.PureComponent {
             </td>
             {/* Render palette swap panel */}
             <td>
-              <div className="title">
+              <div className={styles.title}>
                 Palette Swaps
               </div>
               <PaletteSwapPanel
@@ -185,10 +185,10 @@ class SpriteTool extends React.PureComponent {
           {/* Render full sprite table */}
           <tr>
             <td colSpan="2">
-              <div className="title">
+              <div className={styles.title}>
                 Sprite Sheet
               </div>
-              <div className="spriteSheet">
+              <div className={styles.spriteSheet}>
                 {
                   Object.entries(UNIT_DATA[this.state.unit].activities)
                     .map(([activity, { directions, frameNumbers }]) =>

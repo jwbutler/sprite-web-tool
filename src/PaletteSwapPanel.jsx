@@ -29,7 +29,7 @@ class PaletteSwapPanel extends React.PureComponent {
     const spritePaletteSwaps = paletteSwaps[spriteName] || {};
 
     return (
-      <div className="PaletteSwapPanel">
+      <div className={styles.PaletteSwapPanel}>
         <select name="spriteName" onChange={e => { this.setState({ spriteName: e.target.value }); }}>
           {
             spriteNames.map(spriteName => (

@@ -1,16 +1,16 @@
 import React from 'react';
-import './EquipmentTable.css';
+import styles from './EquipmentTable.css';
 
 const EquipmentTable = ({ equipment, enabledEquipment, onChange }) => (
-  <div className="EquipmentTable">
+  <div className={styles.EquipmentTable}>
     {
       equipment.sort()
         .map(item => (
-          <div className="row">
-            <div className="col">
+          <div className={styles.row}>
+            <div className={styles.col}>
               {item}
               </div>
-            <div className="col">
+            <div className={styles.col}>
               <input
                 type="checkbox"
                 name="equipment"
