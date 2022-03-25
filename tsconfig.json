@@ -15,6 +15,7 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "target": "es2015",
+    "downlevelIteration": true,
     "plugins": [{
       "name": "typescript-plugin-css-modules"
     }]

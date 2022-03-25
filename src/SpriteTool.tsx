@@ -89,8 +89,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                 <select name="unit" onChange={e => this.onChange(e)}>
                   {
                     getAllUnitNames().map(spriteName => (
-                      /* @ts-ignore */
-                      <option name={spriteName} key={spriteName}>
+                      <option key={spriteName}>
                         {spriteName}
                       </option>
                     ))
@@ -145,8 +144,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                         <select name="activity" onChange={e => this.onChange(e)}>
                           {
                             Object.keys(getUnitData(this.state.unit).activities).map(activity => (
-                              /* @ts-ignore */
-                              <option name={activity} key={activity}>
+                              <option key={activity}>
                                 {activity}
                               </option>
                             ))
@@ -165,8 +163,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                         <select name="direction" onChange={e => this.onChange(e)}>
                           {
                             getUnitData(this.state.unit).activities[this.state.activity].directions.map(direction => (
-                              /* @ts-ignore */
-                              <option name={direction} key={direction}>
+                              <option key={direction}>
                                 {direction}
                               </option>
                             ))
@@ -185,8 +182,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                         <select name="frameNumber" onChange={e => this.onChange(e)}>
                           {
                             getUnitData(this.state.unit).activities[this.state.activity].frameNumbers.map(frameNumber => (
-                              /* @ts-ignore */
-                              <option name={frameNumber} key={frameNumber}>
+                              <option key={frameNumber}>
                                 {frameNumber}
                               </option>
                             ))

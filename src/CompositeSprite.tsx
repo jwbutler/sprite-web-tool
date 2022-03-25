@@ -53,8 +53,8 @@ type Props = {
 }
 
 class CompositeSprite extends React.PureComponent<Props> {
-  private loadedImages: any[];
-  private container: any;
+  private loadedImages: HTMLImageElement[];
+  private container: HTMLElement | null;
   private canvas: HTMLCanvasElement | null;
 
   constructor(props: Props) {
@@ -94,7 +94,7 @@ class CompositeSprite extends React.PureComponent<Props> {
     );
   }
 
-  _onImageLoaded(image: any) {
+  _onImageLoaded(image: HTMLImageElement) {
     if (this.loadedImages.indexOf(image) === -1) {
       this.loadedImages.push(image);
     }
@@ -106,13 +106,12 @@ class CompositeSprite extends React.PureComponent<Props> {
     }
   }
 
-
   _drawImages() {
     const { canvas, container } = this;
     const { unit,  activity, direction, frameNumber, paletteSwaps, onChange, onImageLoaded } = this.props;
 
     const context = canvas?.getContext('2d');
-    if (!canvas || !context) {
+    if (!canvas || !context || !container) {
       return;
     }
 
@@ -120,6 +119,7 @@ class CompositeSprite extends React.PureComponent<Props> {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     type ImageWithName = { image: HTMLImageElement, spriteName: string };
+    // @ts-ignore huh?
     const images: ImageWithName[] = [...container.querySelectorAll(`img.${styles.hidden}`)]
       .map(image => ({ image, spriteName: image.getAttribute('data-spritename') }));
 
@@ -171,8 +171,9 @@ class CompositeSprite extends React.PureComponent<Props> {
     });
   };
 
-  _getImages() {
-    return [...this.container.querySelectorAll('img')];
+  _getImages(): HTMLImageElement[] {
+    // @ts-ignore
+    return [...this.container?.querySelectorAll('img')];
   }
 
   _renderCanvas() {

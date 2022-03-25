@@ -29,8 +29,7 @@ class PaletteSwapPanel extends React.PureComponent<Props, State> {
         <select name="spriteName" onChange={e => { this.setState({ spriteName: e.target.value }); }}>
           {
             spriteNames.map(spriteName => (
-              // @ts-ignore
-              <option name={spriteName} key={spriteName}>
+              <option key={spriteName}>
                 {spriteName}
               </option>
             ))
