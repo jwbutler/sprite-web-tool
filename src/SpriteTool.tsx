@@ -1,10 +1,13 @@
 import React from 'react';
 
 import styles from './SpriteTool.css';
-import { generateDownloadLink, UNIT_DATA } from './utils';
+import { generateDownloadLink } from './utils';
 import EquipmentTable from './EquipmentTable';
 import CompositeSprite from './CompositeSprite';
 import PaletteSwapPanel from './PaletteSwapPanel';
+import SpriteDefinitions from './SpriteDefinitions';
+
+const { getDefaultUnit, getUnitData, getAllUnitNames } = SpriteDefinitions;
 
 type State = {
   unit: string,
@@ -22,14 +25,15 @@ class SpriteTool extends React.PureComponent<{}, State> {
   constructor(props: {}) {
     super(props);
 
-    const unit = Object.keys(UNIT_DATA)[0];
-    const activity = Object.keys(UNIT_DATA[unit].activities)[0];
-    const direction = UNIT_DATA[unit].activities[activity].directions[0];
-    const frameNumber = UNIT_DATA[unit].activities[activity].frameNumbers[0];
+    const unitName = getDefaultUnit();
+    const unit = getUnitData(unitName);
+    const activity = Object.keys(unit.activities)[0];
+    const direction = unit.activities[activity].directions[0];
+    const frameNumber = unit.activities[activity].frameNumbers[0];
     const equipment: string[] = [];
 
     this.state = {
-      unit,
+      unit: unitName,
       activity,
       direction,
       frameNumber,
@@ -64,7 +68,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
       [field]: value
     };
 
-    updatedState.equipment = updatedState.equipment.filter(item => UNIT_DATA[updatedState.unit].equipment.indexOf(item) > -1);
+    updatedState.equipment = updatedState.equipment.filter(item => getUnitData(updatedState.unit).equipment.includes(item));
 
     this.setState(updatedState);
   }
@@ -84,7 +88,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
               <td>
                 <select name="unit" onChange={e => this.onChange(e)}>
                   {
-                    Object.keys(UNIT_DATA).map(spriteName => (
+                    getAllUnitNames().map(spriteName => (
                       /* @ts-ignore */
                       <option name={spriteName} key={spriteName}>
                         {spriteName}
@@ -103,7 +107,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
               </td>
               <td>
                 <EquipmentTable
-                  equipment={UNIT_DATA[this.state.unit].equipment}
+                  equipment={getUnitData(this.state.unit).equipment}
                   enabledEquipment={this.state.equipment}
                   onChange = {e => this.onChange(e)}
                 />
@@ -140,7 +144,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                       <td>
                         <select name="activity" onChange={e => this.onChange(e)}>
                           {
-                            Object.keys(UNIT_DATA[this.state.unit].activities).map(activity => (
+                            Object.keys(getUnitData(this.state.unit).activities).map(activity => (
                               /* @ts-ignore */
                               <option name={activity} key={activity}>
                                 {activity}
@@ -160,7 +164,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                       <td>
                         <select name="direction" onChange={e => this.onChange(e)}>
                           {
-                            UNIT_DATA[this.state.unit].activities[this.state.activity].directions.map(direction => (
+                            getUnitData(this.state.unit).activities[this.state.activity].directions.map(direction => (
                               /* @ts-ignore */
                               <option name={direction} key={direction}>
                                 {direction}
@@ -180,7 +184,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                       <td>
                         <select name="frameNumber" onChange={e => this.onChange(e)}>
                           {
-                            UNIT_DATA[this.state.unit].activities[this.state.activity].frameNumbers.map(frameNumber => (
+                            getUnitData(this.state.unit).activities[this.state.activity].frameNumbers.map(frameNumber => (
                               /* @ts-ignore */
                               <option name={frameNumber} key={frameNumber}>
                                 {frameNumber}
@@ -213,7 +217,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                 </div>
                 <div className={styles.spriteSheet}>
                   {
-                    Object.entries(UNIT_DATA[this.state.unit].activities)
+                    Object.entries(getUnitData(this.state.unit).activities)
                       .map(([activity, { directions, frameNumbers }]) =>
                         frameNumbers.map(frameNumber =>
                           directions.map(direction => (

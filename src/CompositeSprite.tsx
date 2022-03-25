@@ -1,17 +1,14 @@
-// @ts-nocheck
-// TODO
-
 import React from 'react';
+import SpriteDefinitions from './SpriteDefinitions';
 import styles from './SpriteTool.css'; // TODO should not use a global style sheet
+
+const { getImageFilename, getShortFilename, getEquipmentData, getUnitData } = SpriteDefinitions;
 
 import {
   comparing,
-  EQUIPMENT_DATA, getImageColors,
-  getImageFilename,
-  getShortFilename,
+  getImageColors,
   isBehind,
-  replaceColors,
-  UNIT_DATA
+  replaceColors
 } from './utils';
 
 const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }: any) => (
@@ -48,7 +45,7 @@ type Props = {
   activity: string,
   direction: string,
   frameNumber: string | number,
-  paletteSwaps: Record<string, Record<string, string>>,
+  paletteSwaps: Record<string, Record<string, string | number[]>>,
   width: number,
   height: number,
   onChange?: (event: any) => void,
@@ -122,21 +119,22 @@ class CompositeSprite extends React.PureComponent<Props> {
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    const images: HTMLImageElement[] = [...container.querySelectorAll(`img.${styles.hidden}`)];
+    type ImageWithName = { image: HTMLImageElement, spriteName: string };
+    const images: ImageWithName[] = [...container.querySelectorAll(`img.${styles.hidden}`)]
+      .map(image => ({ image, spriteName: image.getAttribute('data-spritename') }));
 
-    const behindImages = images.filter(image => isBehind(image))
-      .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
-    const unitImage = images.filter(image => UNIT_DATA[image.getAttribute('data-spriteName')])[0];
-    const aheadImages = images.filter(image => !UNIT_DATA[image.getAttribute('data-spriteName')])
-      .filter(image => !isBehind(image))
-      .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
+    const behindImages = images.filter(({ image, spriteName }) => isBehind(image))
+      .sort(comparing(({ image, spriteName }) => getEquipmentData(spriteName).drawOrder));
+    const unitImage = images.filter(({ image, spriteName }) => getUnitData(spriteName))[0];
+    const aheadImages = images.filter(({ image, spriteName }) => !getUnitData(spriteName))
+      .filter(({ image }) => !isBehind(image))
+      .sort(comparing(({ spriteName }) => getEquipmentData(spriteName).drawOrder));
 
-    const sortedImages = [...behindImages, unitImage, ...aheadImages];
+    const sortedImages: ImageWithName[] = [...behindImages, unitImage, ...aheadImages];
 
     const updatedPaletteSwaps = {...paletteSwaps};
     let arePaletteSwapsUpdated = false;
-    sortedImages.forEach(image => {
-      const spriteName = image.getAttribute('data-spriteName');
+    sortedImages.forEach(({ image, spriteName }) => {
       const imageColors = getImageColors(image);
       if (!updatedPaletteSwaps[spriteName]) {
         arePaletteSwapsUpdated = true;
@@ -156,9 +154,8 @@ class CompositeSprite extends React.PureComponent<Props> {
       });
     }
 
-    const drawPromises = sortedImages.map(image => {
-      const spriteName = image.getAttribute('data-spriteName');
-      const spritePaletteSwaps = paletteSwaps[spriteName] || {};
+    const drawPromises = sortedImages.map(({ image, spriteName }) => {
+      const spritePaletteSwaps: Record<string, (string | number[])> = paletteSwaps[spriteName] || {};
       spritePaletteSwaps['#ffffff'] = [0, 0, 0, 0];
       return replaceColors(image, spritePaletteSwaps);
     });
