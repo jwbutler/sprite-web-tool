@@ -1,7 +1,8 @@
 import React from 'react';
 import SpriteDefinitions from './SpriteDefinitions';
 import styles from './SpriteTool.css';
-import ChangeEvent from './types/ChangeEvent'; // TODO should not use a global style sheet
+import ChangeEvent from './types/ChangeEvent';
+import UnitModel from './types/UnitModel'; // TODO should not use a global style sheet
 
 const { getImageFilename, getShortFilename, getEquipmentData, getUnitData } = SpriteDefinitions;
 
@@ -41,7 +42,7 @@ const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteS
 );
 
 type Props = {
-  unit: string,
+  unit: UnitModel,
   equipment: string[],
   activity: string,
   direction: string,
@@ -68,11 +69,11 @@ class CompositeSprite extends React.PureComponent<Props> {
     return (
       <span ref={e => { this.container = e; }}>
         <UnitImage
-          spriteName={unit}
+          spriteName={unit.spriteName}
           activity={activity}
           direction={direction}
           frameNumber={frameNumber}
-          paletteSwaps={entityToPaletteSwaps[unit]}
+          paletteSwaps={entityToPaletteSwaps[unit.spriteName]}
         />
         {
           equipment.map(spriteName => (
@@ -168,7 +169,7 @@ class CompositeSprite extends React.PureComponent<Props> {
       }
 
       const imageBlob = canvas.toDataURL('image/png').split('base64,')[1];
-      const outputFilename = getShortFilename(unit, activity, direction, frameNumber);
+      const outputFilename = getShortFilename(unit.spriteName, activity, direction, frameNumber);
       onImageLoaded && onImageLoaded(outputFilename, imageBlob);
     });
   };

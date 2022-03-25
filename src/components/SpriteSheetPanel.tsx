@@ -1,18 +1,16 @@
 import React from 'react';
 import CompositeSprite from '../CompositeSprite';
-import SpriteDefinitions from '../SpriteDefinitions';
 import styles from '../SpriteTool.css';
-
-const { getUnitData } = SpriteDefinitions;
+import UnitModel from '../types/UnitModel';
 
 type Props = {
-  unitName: string,
+  unit: UnitModel,
   equipment: string[],
   entityToPaletteSwaps: Record<string, Record<string, string>>,
   onImageLoaded: (filename: string, blob: string) => void
 };
 
-const SpriteSheetPanel = ({ unitName, equipment, entityToPaletteSwaps, onImageLoaded }: Props) => {
+const SpriteSheetPanel = ({ unit, equipment, entityToPaletteSwaps, onImageLoaded }: Props) => {
   return (
     <tr>
       <td colSpan={2}>
@@ -21,13 +19,13 @@ const SpriteSheetPanel = ({ unitName, equipment, entityToPaletteSwaps, onImageLo
         </div>
         <div className={styles.spriteSheet}>
           {
-            Object.entries(getUnitData(unitName).activities)
+            Object.entries(unit.activities)
               .map(([activity, { directions, frameNumbers }]) =>
                 frameNumbers.map(frameNumber =>
                   directions.map(direction => (
                     <CompositeSprite
-                      key={`${unitName}_${activity}_${direction}_${frameNumber}`}
-                      unit={unitName}
+                      key={`${unit.spriteName}_${activity}_${direction}_${frameNumber}`}
+                      unit={unit}
                       equipment={equipment}
                       activity={activity}
                       direction={direction}

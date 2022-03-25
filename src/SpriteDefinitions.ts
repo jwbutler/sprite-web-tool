@@ -1,10 +1,11 @@
-import EquipmentData from './EquipmentData';
-import UnitData from "./UnitData";
+import EquipmentModel from './types/EquipmentModel';
+import UnitModel from './types/UnitModel';
 
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
-const UNIT_DATA: Record<string, UnitData> = {
+const UNIT_DATA: Record<string, UnitModel> = {
   player: {
+    spriteName: 'player',
     equipment: ['bow', 'beard', 'cloak', 'club', 'crown', 'hat', 'hat2', 'helmet', 'helm2', 'mail', 'shield', 'shield2', 'shield3', 'sword'], // TODO SPEAR
     activities: {
       standing: {
@@ -23,6 +24,7 @@ const UNIT_DATA: Record<string, UnitData> = {
     spriteDirectory: 'units/player',
   },
   zombie: {
+    spriteName: 'zombie',
     equipment: [],
     activities: {
       standing: {
@@ -41,6 +43,7 @@ const UNIT_DATA: Record<string, UnitData> = {
     spriteDirectory: 'units/zombie',
   },
   female: {
+    spriteName: 'female',
     equipment: ['sword_female', 'skirt'],
     activities: {
       standing: {
@@ -74,7 +77,7 @@ const UNIT_DATA: Record<string, UnitData> = {
   },*/
 };
 
-const EQUIPMENT_DATA: Record<string, EquipmentData> = {
+const EQUIPMENT_DATA: Record<string, EquipmentModel> = {
   beard: {
     spriteDirectory: 'equipment/beard',
     drawOrder: 3,
@@ -193,8 +196,8 @@ const getAnyFrame = async (spriteName: string): Promise<HTMLImageElement> => {
 const getDefaultUnit = () => Object.keys(UNIT_DATA)[0];
 
 export default {
-  getUnitData: (spriteName: string): UnitData => UNIT_DATA[spriteName],
-  getEquipmentData: (spriteName: string): EquipmentData => EQUIPMENT_DATA[spriteName],
+  getUnitData: (spriteName: string): UnitModel => UNIT_DATA[spriteName],
+  getEquipmentData: (spriteName: string): EquipmentModel => EQUIPMENT_DATA[spriteName],
   getAnyFrame,
   getImageFilename,
   getShortFilename,
@@ -202,4 +205,4 @@ export default {
   getAllUnitNames: (): string[] => Object.keys(UNIT_DATA)
 };
 
-export type { UnitData };
+export type { UnitModel };

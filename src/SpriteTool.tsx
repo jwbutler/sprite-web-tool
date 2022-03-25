@@ -4,6 +4,7 @@ import SpriteSheetPanel from './components/SpriteSheetPanel';
 
 import styles from './SpriteTool.css';
 import ChangeEvent from './types/ChangeEvent';
+import UnitModel from './types/UnitModel';
 import { generateDownloadLink } from './utils';
 import EquipmentTable from './components/EquipmentTable';
 import CompositeSprite from './CompositeSprite';
@@ -13,7 +14,7 @@ import SpriteDefinitions from './SpriteDefinitions';
 const { getDefaultUnit, getUnitData, getAllUnitNames } = SpriteDefinitions;
 
 type State = {
-  unitName: string,
+  unit: UnitModel,
   activity: string,
   direction: string,
   frameNumber: number | string,
@@ -36,7 +37,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
     const equipment: string[] = [];
 
     this.state = {
-      unitName,
+      unit,
       activity,
       direction,
       frameNumber,
@@ -70,7 +71,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
       [field]: value
     };
 
-    updatedState.equipment = updatedState.equipment.filter(item => getUnitData(updatedState.unitName).equipment.includes(item));
+    updatedState.equipment = updatedState.equipment.filter(item => updatedState.unit.equipment.includes(item));
 
     this.setState(updatedState);
   }
@@ -99,7 +100,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
             </td>
             <td>
               <EquipmentTable
-                equipment={getUnitData(this.state.unitName).equipment}
+                equipment={this.state.unit.equipment}
                 enabledEquipment={this.state.equipment}
                 onChange={e => this.handleChange(e)}
               />
@@ -113,7 +114,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
               </div>
               <div className={styles.preview}>
                 <CompositeSprite
-                  unit={this.state.unitName}
+                  unit={this.state.unit}
                   equipment={this.state.equipment}
                   activity={this.state.activity}
                   direction={this.state.direction}
@@ -125,7 +126,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
                 />
               </div>
               <FrameSelector
-                unit={this.state.unitName}
+                unit={this.state.unit.spriteName}
                 activity={this.state.activity}
                 onChange={e => this.handleChange(e)}
               />
@@ -144,8 +145,8 @@ class SpriteTool extends React.PureComponent<{}, State> {
           </tr>
           <SpriteSheetPanel
             entityToPaletteSwaps={this.state.paletteSwaps}
+            unit={this.state.unit}
             equipment={this.state.equipment}
-            unitName={this.state.unitName}
             onImageLoaded={this.handleImageLoaded}
           />
           {/* Render save button */}
@@ -184,7 +185,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
   }
 
   _getEnabledSpriteNames = () => {
-    return [this.state.unitName, ...this.state.equipment];
+    return [this.state.unit.spriteName, ...this.state.equipment];
   };
 }
 

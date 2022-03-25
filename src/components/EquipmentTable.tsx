@@ -1,10 +1,11 @@
 import React from 'react';
+import ChangeEvent from '../types/ChangeEvent';
 import styles from './EquipmentTable.css';
 
 type Props = {
-  equipment: any[],
-  enabledEquipment: any[],
-  onChange: (e: any) => void;
+  equipment: string[],
+  enabledEquipment: string[],
+  onChange: (e: ChangeEvent) => void;
 };
 
 const EquipmentTable = ({ equipment, enabledEquipment, onChange }: Props) => (
