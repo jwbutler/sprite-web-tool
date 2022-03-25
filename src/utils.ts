@@ -1,7 +1,24 @@
 import JSZip from 'jszip';
 
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-const UNIT_DATA = {
+
+type Activity = {
+  directions: string[],
+  frameNumbers: (string | number)[];
+}
+
+type UnitData = {
+  equipment: string[],
+  activities: Record<string, Activity>,
+  spriteDirectory: string
+};
+
+type EquipmentData = {
+  spriteDirectory: string,
+  drawOrder: number
+};
+
+const UNIT_DATA: Record<string, UnitData> = {
   player: {
     equipment: ['bow', 'beard', 'cloak', 'club', 'crown', 'hat', 'hat2', 'helmet', 'helm2', 'mail', 'shield', 'shield2', 'shield3', 'sword'], // TODO SPEAR
     activities: {
@@ -72,7 +89,7 @@ const UNIT_DATA = {
   },*/
 };
 
-const EQUIPMENT_DATA = {
+const EQUIPMENT_DATA: Record<string, EquipmentData> = {
   beard: {
     spriteDirectory: 'equipment/beard',
     drawOrder: 3,
@@ -143,7 +160,7 @@ const EQUIPMENT_DATA = {
   }
 };
 
-const hasData = (image) => {
+const hasData = (image: HTMLImageElement) => {
   // TODO better way to do this?
   return image.width && image.height;
 };
@@ -151,40 +168,41 @@ const hasData = (image) => {
 /**
  * @private
  */
-const _getSpriteDirectory = (spriteName) => {
+const _getSpriteDirectory = (spriteName: string): string => {
   if (UNIT_DATA[spriteName]) {
     return `png/${UNIT_DATA[spriteName].spriteDirectory}`;
   } else if (EQUIPMENT_DATA[spriteName]) {
     return `png/${EQUIPMENT_DATA[spriteName].spriteDirectory}`;
   }
+  throw new Error();
 };
 
-const getImageFilename = (spriteName, activity, direction, frameNumber, behind) => {
+const getImageFilename = (spriteName: string, activity: string, direction: string, frameNumber: number | string, behind: boolean) => {
   const directory = _getSpriteDirectory(spriteName);
   return `${directory}/${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
 };
 
-const getShortFilename = (spriteName, activity, direction, frameNumber, behind) => {
+const getShortFilename = (spriteName: string, activity: string, direction: string, frameNumber: number | string, behind: boolean) => {
   return `${spriteName}_${activity}_${direction}_${frameNumber}${behind ? '_B' : ''}.png`;
 };
 
 /**
  * @private
  */
-const _zeroPad = (string, length) => {
+const _zeroPad = (string: string, length: number) => {
   while (string.length < length) {
     string = `0${string}`;
   }
   return string;
 };
 
-const rgb2hex = (r, g, b) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
+const rgb2hex = (r: number, g: number, b: number) => `#${_zeroPad(r.toString(16), 2)}${_zeroPad(g.toString(16), 2)}${_zeroPad(b.toString(16), 2)}`;
 
 /**
- * @param {String} hex e.g. '#abcdef'
- * @return {Array<int>} [r, g, b, 255]
+ * @param hex e.g. '#abcdef'
+ * @return [r, g, b, 255]
  */
-const hex2rgba = (hex) => {
+const hex2rgba = (hex: string): number[] => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
@@ -194,20 +212,20 @@ const hex2rgba = (hex) => {
 /**
  * @param {HTMLImageElement} image
  * @param {Object} colorMap A map of (hex => hex) OR (hex => [r, g, b, a])
- * @return Promise<HTMLImageElement>
+ * @return
  */
-const replaceColors = (image, colorMap) => {
+const replaceColors = async (image: HTMLImageElement, colorMap: Record<string, string | number[]>): Promise<HTMLImageElement> => {
   const t1 = new Date().getTime();
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
-    const context = canvas.getContext('2d', {});
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
     context.drawImage(image, 0, 0);
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
     const rgbaSwaps = Object.entries(colorMap)
-      .map(([source, dest]) => [hex2rgba(source), dest[0] === '#' ? hex2rgba(dest) : dest]);
+      .map(([source, dest]) => [hex2rgba(source), dest[0] === '#' ? hex2rgba(dest as string) : dest as number[]]);
 
     for (let i = 0; i < imageData.data.length; i += 4) {
       for (let j = 0; j < rgbaSwaps.length; j++) {
@@ -233,25 +251,19 @@ const replaceColors = (image, colorMap) => {
 
 /**
  * Apparently we can't directly compare src vs. data-behind because src can have file:/// prepended to it.
- * @returns {boolean} whether the image should be drawn behind the unit sprite
- * @private
  */
-const isBehind = (image) => {
+const isBehind = (image: HTMLImageElement): boolean => {
   if (!image.getAttribute('data-behind')) {
     return false;
   }
   const srcParts = image.src.split('/');
-  const behindParts = image.getAttribute('data-behind').split('/');
-  return srcParts[srcParts.length - 1] === behindParts[behindParts.length - 1];
+  const behindParts = image.getAttribute('data-behind')?.split('/');
+  return behindParts && (srcParts[srcParts.length - 1] === behindParts[behindParts.length - 1]) || false;
 };
 
-const comparing = (keyFunction) => ((a, b) => keyFunction(a) - keyFunction(b));
+const comparing = <T,U> (keyFunction: (t: T) => number) => ((a: T, b: T) => keyFunction(a) - keyFunction(b));
 
-/**
- * @param {Object<string, string>} filenameToBlob
- * @returns {Promise<String>}
- */
-const generateDownloadLink = (filenameToBlob) => {
+const generateDownloadLink = async (filenameToBlob: Record<string, string>): Promise<string> => {
   const zip = new JSZip();
   Object.entries(filenameToBlob).forEach(([filename, blob]) =>{
     zip.file(filename, blob, { base64: true });
@@ -261,14 +273,11 @@ const generateDownloadLink = (filenameToBlob) => {
 
 /**
  * TODO: Assumes that any one frame will have all the colors for every animation.
- *
- * @param {HTMLImageElement} image
- * @return Array<String>
  */
-const getImageColors = (image) => {
-  const colors = {};
+const getImageColors = (image: HTMLImageElement): string[] => {
+  const colors: Record<string, string> = {};
   const tmpCanvas = document.createElement('canvas');
-  const tmpContext = tmpCanvas.getContext('2d');
+  const tmpContext = tmpCanvas.getContext('2d') as CanvasRenderingContext2D;
   tmpCanvas.width = image.width;
   tmpCanvas.height = image.height;
   tmpContext.drawImage(image, 0, 0);
@@ -281,15 +290,12 @@ const getImageColors = (image) => {
   return Object.values(colors);
 };
 
-/**
- * @return {Promise<HTMLImageElement>}
- */
-const getAnyFrame = (spriteName) => {
+const getAnyFrame = async (spriteName: string): Promise<HTMLImageElement> => {
   let activities;
   if (UNIT_DATA.hasOwnProperty(spriteName)) {
     activities = UNIT_DATA[spriteName].activities;
   } else { // equipment
-    const unitName = Object.keys(UNIT_DATA).find(u => UNIT_DATA[u].equipment.indexOf(spriteName) > -1);
+    const unitName = Object.keys(UNIT_DATA).find(u => UNIT_DATA[u].equipment.indexOf(spriteName) > -1) as string;
     activities = UNIT_DATA[unitName].activities;
   }
   const activity = Object.keys(activities)[0];
@@ -308,10 +314,10 @@ const getAnyFrame = (spriteName) => {
       img.src = behindFilename;
       resolve(img);
     };
-  })
+  });
 };
 
-const arrayEquals = (first, second) => {
+const arrayEquals = (first: any[], second: any[]) => {
   return (
     first.every(e => second.indexOf(e) > -1)
     && second.every(e => first.indexOf(e) > -1)
@@ -321,7 +327,7 @@ const arrayEquals = (first, second) => {
 /**
  * Still pretty shallow
  */
-const objectEquals = (first, second) => {
+const objectEquals = (first: any, second: any) => {
   return (
     Object.entries(first).every(([k, v]) => second[k] === v)
     && Object.entries(second).every(([k, v]) => first[k] === v)

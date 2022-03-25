@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "baseUrl": ".",
@@ -15,7 +14,10 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
-    "target": "es2015"
+    "target": "es2015",
+    "plugins": [{
+      "name": "typescript-plugin-css-modules"
+    }]
   },
   "paths": {
     "*": ["*"]

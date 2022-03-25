@@ -1,7 +1,13 @@
 import React from 'react';
 import styles from './EquipmentTable.css';
 
-const EquipmentTable = ({ equipment, enabledEquipment, onChange }) => (
+type Props = {
+  equipment: any[],
+  enabledEquipment: any[],
+  onChange: (e: any) => void;
+};
+
+const EquipmentTable = ({ equipment, enabledEquipment, onChange }: Props) => (
   <div className={styles.EquipmentTable}>
     {
       equipment.sort()
@@ -9,7 +15,7 @@ const EquipmentTable = ({ equipment, enabledEquipment, onChange }) => (
           <div className={styles.row}>
             <div className={styles.col}>
               {item}
-              </div>
+            </div>
             <div className={styles.col}>
               <input
                 type="checkbox"

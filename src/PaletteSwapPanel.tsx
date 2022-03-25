@@ -1,38 +1,35 @@
 import React from 'react';
 import styles from './PaletteSwapPanel.css';
 
-/**
- * @typedef {{
- *   spriteName: string,
- *   spriteNames: Array<string>,
- *   paletteSwaps: Object<string, string>,
- *   onChange: function(Event, void)
- * }}
- */
-let Props;
+type Props = {
+  spriteNames: string[],
+  paletteSwaps: Record<string, Record<string, string>>,
+  onChange: (e: any) => void;
+};
 
-class PaletteSwapPanel extends React.PureComponent {
+type State = {
+  spriteName: string
+}
 
-  /**
-   * @param {Props} props
-   */
-  constructor(props) {
+class PaletteSwapPanel extends React.PureComponent<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       spriteName: props.spriteNames[0]
-    }
+    };
   }
 
   render() {
-    const { spriteNames, paletteSwaps, onChange } = this.props;
+    const { spriteNames, paletteSwaps } = this.props;
     const { spriteName } = this.state;
-    const spritePaletteSwaps = paletteSwaps[spriteName] || {};
+    const spritePaletteSwaps: Record<string, string> = paletteSwaps[spriteName] || {};
 
     return (
       <div className={styles.PaletteSwapPanel}>
         <select name="spriteName" onChange={e => { this.setState({ spriteName: e.target.value }); }}>
           {
             spriteNames.map(spriteName => (
+              // @ts-ignore
               <option name={spriteName} key={spriteName}>
                 {spriteName}
               </option>
@@ -83,7 +80,7 @@ class PaletteSwapPanel extends React.PureComponent {
     }
   }
 
-  _onChangePaletteSwaps(source, dest) {
+  _onChangePaletteSwaps(source: string, dest: string) {
     const { spriteName } = this.state;
     const paletteSwaps = { ... this.props.paletteSwaps };
     paletteSwaps[spriteName] = paletteSwaps[spriteName] || {};

@@ -1,4 +1,9 @@
+// @ts-nocheck
+// TODO
+
 import React from 'react';
+import styles from './SpriteTool.css'; // TODO should not use a global style sheet
+
 import {
   comparing,
   EQUIPMENT_DATA, getImageColors,
@@ -9,9 +14,9 @@ import {
   UNIT_DATA
 } from './utils';
 
-const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }) => (
+const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps }: any) => (
   <img
-    className="hidden"
+    className={styles.hidden}
     src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
     key={spriteName}
     data-spriteName={spriteName}
@@ -22,9 +27,9 @@ const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps 
   />
 );
 
-const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps, onError }) => (
+const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps, onError }: any) => (
   <img
-    className="hidden"
+    className={styles.hidden}
     src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
     key={spriteName}
     onError={e => onError(e)}
@@ -37,27 +42,25 @@ const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteS
   />
 );
 
-/**
- * @typedef {{
- *   unit: string,
- *   equipment: Array<string>,
- *   activity: string,
- *   direction: string,
- *   frameNumber: string | number,
- *   paletteSwaps: Object<string, string>,
- *   width: number,
- *   height: number,
- *   onChange: function(event): void,
- *   onImageLoaded: ?function(string, string): void
- * }}
- */
-let Props;
+type Props = {
+  unit: string,
+  equipment: string[],
+  activity: string,
+  direction: string,
+  frameNumber: string | number,
+  paletteSwaps: Record<string, Record<string, string>>,
+  width: number,
+  height: number,
+  onChange?: (event: any) => void,
+  onImageLoaded?: (first: string, second: string) => void /** TODO what are these params? */
+}
 
-class CompositeSprite extends React.PureComponent {
-  /**
-   * @param {Props} props
-   */
-  constructor(props) {
+class CompositeSprite extends React.PureComponent<Props> {
+  private loadedImages: any[];
+  private container: any;
+  private canvas: HTMLCanvasElement | null;
+
+  constructor(props: Props) {
     super(props);
     this.loadedImages = [];
   }
@@ -65,7 +68,7 @@ class CompositeSprite extends React.PureComponent {
   render() {
     const { unit, equipment, activity, direction, frameNumber, paletteSwaps, width, height } = this.props;
     return (
-      <span ref={e => this.container = e}>
+      <span ref={e => { this.container = e; }}>
         <UnitImage
           spriteName={unit}
           activity={activity}
@@ -81,7 +84,7 @@ class CompositeSprite extends React.PureComponent {
               direction={direction}
               frameNumber={frameNumber}
               paletteSwaps={paletteSwaps[spriteName]}
-              onError={e => this._swapToBehindImage(e)}
+              onError={(e: any) => this._swapToBehindImage(e)}
             />
           ))
         }
@@ -94,7 +97,7 @@ class CompositeSprite extends React.PureComponent {
     );
   }
 
-  _onImageLoaded(image) {
+  _onImageLoaded(image: any) {
     if (this.loadedImages.indexOf(image) === -1) {
       this.loadedImages.push(image);
     }
@@ -106,15 +109,20 @@ class CompositeSprite extends React.PureComponent {
     }
   }
 
+
   _drawImages() {
     const { canvas, container } = this;
     const { unit,  activity, direction, frameNumber, paletteSwaps, onChange, onImageLoaded } = this.props;
 
-    const context = canvas.getContext('2d');
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) {
+      return;
+    }
+
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    const images = [...container.querySelectorAll('img.hidden')];
+    const images: HTMLImageElement[] = [...container.querySelectorAll(`img.${styles.hidden}`)];
 
     const behindImages = images.filter(image => isBehind(image))
       .sort(comparing(image => EQUIPMENT_DATA[image.getAttribute('data-spriteName')].drawOrder));
@@ -174,7 +182,10 @@ class CompositeSprite extends React.PureComponent {
     this.loadedImages = [];
 
     const { canvas } = this;
-    const context = canvas.getContext('2d');
+    if (!canvas) {
+      return;
+    }
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
     context.imageSmoothingEnabled = false;
     const scaleX = (canvas.width / 40);
@@ -189,7 +200,7 @@ class CompositeSprite extends React.PureComponent {
     }, this);
   };
 
-  _swapToBehindImage(e) {
+  _swapToBehindImage(e: any) {
     e.target.src = e.target.getAttribute('data-behind');
     this._renderCanvas();
   };
