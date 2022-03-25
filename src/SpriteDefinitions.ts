@@ -1,20 +1,7 @@
+import EquipmentData from './EquipmentData';
+import UnitData from "./UnitData";
+
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-
-type Activity = {
-  directions: string[],
-  frameNumbers: (string | number)[];
-}
-
-type UnitData = {
-  equipment: string[],
-  activities: Record<string, Activity>,
-  spriteDirectory: string
-};
-
-type EquipmentData = {
-  spriteDirectory: string,
-  drawOrder: number
-};
 
 const UNIT_DATA: Record<string, UnitData> = {
   player: {
@@ -214,3 +201,5 @@ export default {
   getDefaultUnit,
   getAllUnitNames: (): string[] => Object.keys(UNIT_DATA)
 };
+
+export type { UnitData };

@@ -9,15 +9,23 @@ import SpriteDefinitions from './SpriteDefinitions';
 
 const { getDefaultUnit, getUnitData, getAllUnitNames } = SpriteDefinitions;
 
+type ChangeEvent = {
+  target: {
+    name: string,
+    type: string,
+    value: string
+  }
+};
+
 type State = {
-  unit: string,
+  unitName: string,
   activity: string,
   direction: string,
   frameNumber: number | string,
   equipment: string[],
-  filenameToBlob: Record<string, any>,
-  dataBlob: any,
-  dataLink: any,
+  filenameToBlob: Record<string, string>,
+  dataBlob: string | null,
+  dataLink: string | null,
   paletteSwaps: Record<string, Record<string, string>>
 };
 
@@ -33,7 +41,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
     const equipment: string[] = [];
 
     this.state = {
-      unit: unitName,
+      unitName,
       activity,
       direction,
       frameNumber,
@@ -41,12 +49,11 @@ class SpriteTool extends React.PureComponent<{}, State> {
       dataBlob: null,
       dataLink: null,
       filenameToBlob: {},
-      // spriteName -> (color -> color)
       paletteSwaps: {}
     };
   }
 
-  onChange(e: any) {
+  onChange(e: ChangeEvent) {
     const field = e.target.name;
     const eventValue = e.target.value;
     let value;
@@ -68,7 +75,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
       [field]: value
     };
 
-    updatedState.equipment = updatedState.equipment.filter(item => getUnitData(updatedState.unit).equipment.includes(item));
+    updatedState.equipment = updatedState.equipment.filter(item => getUnitData(updatedState.unitName).equipment.includes(item));
 
     this.setState(updatedState);
   }
@@ -106,7 +113,7 @@ class SpriteTool extends React.PureComponent<{}, State> {
               </td>
               <td>
                 <EquipmentTable
-                  equipment={getUnitData(this.state.unit).equipment}
+                  equipment={getUnitData(this.state.unitName).equipment}
                   enabledEquipment={this.state.equipment}
                   onChange = {e => this.onChange(e)}
                 />
@@ -120,78 +127,25 @@ class SpriteTool extends React.PureComponent<{}, State> {
                 </div>
                 <div className={styles.preview}>
                   <CompositeSprite
-                    unit={this.state.unit}
+                    unit={this.state.unitName}
                     equipment={this.state.equipment}
                     activity={this.state.activity}
                     direction={this.state.direction}
                     frameNumber={this.state.frameNumber}
-                    paletteSwaps={this.state.paletteSwaps}
+                    entityToPaletteSwaps={this.state.paletteSwaps}
                     width={160}
                     height={160}
                     onChange={e => this.onChange(e)}
                   />
                 </div>
                 {/* Render activity selection */}
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <label htmlFor="activity">
-                          Activity
-                        </label>
-                      </td>
-                      <td>
-                        <select name="activity" onChange={e => this.onChange(e)}>
-                          {
-                            Object.keys(getUnitData(this.state.unit).activities).map(activity => (
-                              <option key={activity}>
-                                {activity}
-                              </option>
-                            ))
-                          }
-                        </select>
-                      </td>
-                    </tr>
-                    {/* Render direction selection */}
-                    <tr>
-                      <td>
-                        <label htmlFor="direction">
-                          Direction
-                        </label>
-                      </td>
-                      <td>
-                        <select name="direction" onChange={e => this.onChange(e)}>
-                          {
-                            getUnitData(this.state.unit).activities[this.state.activity].directions.map(direction => (
-                              <option key={direction}>
-                                {direction}
-                              </option>
-                            ))
-                          }
-                        </select>
-                      </td>
-                    </tr>
-                    {/* Render frame number selection */}
-                    <tr>
-                      <td>
-                        <label htmlFor="frameNumber">
-                          Frame Number
-                        </label>
-                      </td>
-                      <td>
-                        <select name="frameNumber" onChange={e => this.onChange(e)}>
-                          {
-                            getUnitData(this.state.unit).activities[this.state.activity].frameNumbers.map(frameNumber => (
-                              <option key={frameNumber}>
-                                {frameNumber}
-                              </option>
-                            ))
-                          }
-                        </select>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <FrameSelectionTable
+                  unit={this.state.unitName}
+                  activity={this.state.activity}
+                  direction={this.state.direction}
+                  frameNumber={this.state.frameNumber}
+                  onChange={e => this.onChange(e)}
+                />
               </td>
               {/* Render palette swap panel */}
               <td>
@@ -213,18 +167,18 @@ class SpriteTool extends React.PureComponent<{}, State> {
                 </div>
                 <div className={styles.spriteSheet}>
                   {
-                    Object.entries(getUnitData(this.state.unit).activities)
+                    Object.entries(getUnitData(this.state.unitName).activities)
                       .map(([activity, { directions, frameNumbers }]) =>
                         frameNumbers.map(frameNumber =>
                           directions.map(direction => (
                             <CompositeSprite
-                              key={`${this.state.unit}_${activity}_${direction}_${frameNumber}`}
-                              unit={this.state.unit}
+                              key={`${this.state.unitName}_${activity}_${direction}_${frameNumber}`}
+                              unit={this.state.unitName}
                               equipment={this.state.equipment}
                               activity={activity}
                               direction={direction}
                               frameNumber={frameNumber}
-                              paletteSwaps={this.state.paletteSwaps}
+                              entityToPaletteSwaps={this.state.paletteSwaps}
                               onImageLoaded={(filename, blob) => {
                                 const { filenameToBlob } = this.state;
                                 filenameToBlob[filename] = blob;
@@ -281,8 +235,79 @@ class SpriteTool extends React.PureComponent<{}, State> {
   }
 
   _getEnabledSpriteNames = () => {
-    return [this.state.unit, ...this.state.equipment];
+    return [this.state.unitName, ...this.state.equipment];
   };
 }
+
+type FrameSelectionTableProps = {
+  onChange: (e: any) => void,
+  unit: string,
+  activity: string,
+  direction: string,
+  frameNumber: number | string
+};
+
+const FrameSelectionTable = ({ onChange, unit, activity, direction, frameNumber }: FrameSelectionTableProps) => (
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <label htmlFor="activity">
+            Activity
+          </label>
+        </td>
+        <td>
+          <select name="activity" onChange={e => onChange(e)}>
+            {
+              Object.keys(getUnitData(unit).activities).map(activity => (
+                <option key={activity}>
+                  {activity}
+                </option>
+              ))
+            }
+          </select>
+        </td>
+      </tr>
+      {/* Render direction selection */}
+      <tr>
+        <td>
+          <label htmlFor="direction">
+            Direction
+          </label>
+        </td>
+        <td>
+          <select name="direction" onChange={e => onChange(e)}>
+            {
+              getUnitData(unit).activities[activity].directions.map(direction => (
+                <option key={direction}>
+                  {direction}
+                </option>
+              ))
+            }
+          </select>
+        </td>
+      </tr>
+      {/* Render frame number selection */}
+      <tr>
+        <td>
+          <label htmlFor="frameNumber">
+            Frame Number
+          </label>
+        </td>
+        <td>
+          <select name="frameNumber" onChange={e => onChange(e)}>
+            {
+              getUnitData(unit).activities[activity].frameNumbers.map(frameNumber => (
+                <option key={frameNumber}>
+                  {frameNumber}
+                </option>
+              ))
+            }
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+);
 
 export default SpriteTool;

@@ -12,7 +12,7 @@ const EquipmentTable = ({ equipment, enabledEquipment, onChange }: Props) => (
     {
       equipment.sort()
         .map(item => (
-          <div className={styles.row}>
+          <div className={styles.row} key={item}>
             <div className={styles.col}>
               {item}
             </div>
@@ -21,7 +21,7 @@ const EquipmentTable = ({ equipment, enabledEquipment, onChange }: Props) => (
                 type="checkbox"
                 name="equipment"
                 value={item}
-                checked={enabledEquipment.indexOf(item) > -1}
+                checked={enabledEquipment.includes(item)}
                 onChange={e => onChange(e)}
                 key={item}
               />

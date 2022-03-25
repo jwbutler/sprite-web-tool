@@ -16,11 +16,11 @@ const UnitImage = ({ spriteName, activity, direction, frameNumber, paletteSwaps 
     className={styles.hidden}
     src={getImageFilename(spriteName, activity, direction, frameNumber, false)}
     key={spriteName}
-    data-spriteName={spriteName}
+    data-spritename={spriteName}
     data-activity={activity}
     data-direction={direction}
-    data-frameNumber={frameNumber}
-    data-paletteSwaps={JSON.stringify(paletteSwaps)}
+    data-framenumber={frameNumber}
+    data-paletteswaps={JSON.stringify(paletteSwaps)}
   />
 );
 
@@ -31,11 +31,11 @@ const EquipmentImage = ({ spriteName, activity, direction, frameNumber, paletteS
     key={spriteName}
     onError={e => onError(e)}
     data-behind={getImageFilename(spriteName, activity, direction, frameNumber, true)}
-    data-spriteName={spriteName}
+    data-spritename={spriteName}
     data-activity={activity}
     data-direction={direction}
-    data-frameNumber={frameNumber}
-    data-paletteSwaps={JSON.stringify(paletteSwaps)}
+    data-framenumber={frameNumber}
+    data-paletteswaps={JSON.stringify(paletteSwaps)}
   />
 );
 
@@ -45,11 +45,11 @@ type Props = {
   activity: string,
   direction: string,
   frameNumber: string | number,
-  paletteSwaps: Record<string, Record<string, string | number[]>>,
+  entityToPaletteSwaps: Record<string, Record<string, string | number[]>>,
   width: number,
   height: number,
   onChange?: (event: any) => void,
-  onImageLoaded?: (first: string, second: string) => void /** TODO what are these params? */
+  onImageLoaded?: (outputFilename: string, imageBlob: string) => void
 }
 
 class CompositeSprite extends React.PureComponent<Props> {
@@ -62,8 +62,8 @@ class CompositeSprite extends React.PureComponent<Props> {
     this.loadedImages = [];
   }
 
-  render() {
-    const { unit, equipment, activity, direction, frameNumber, paletteSwaps, width, height } = this.props;
+  render = () => {
+    const { unit, equipment, activity, direction, frameNumber, entityToPaletteSwaps, width, height } = this.props;
     return (
       <span ref={e => { this.container = e; }}>
         <UnitImage
@@ -71,7 +71,7 @@ class CompositeSprite extends React.PureComponent<Props> {
           activity={activity}
           direction={direction}
           frameNumber={frameNumber}
-          paletteSwaps={paletteSwaps[unit]}
+          paletteSwaps={entityToPaletteSwaps[unit]}
         />
         {
           equipment.map(spriteName => (
@@ -80,7 +80,7 @@ class CompositeSprite extends React.PureComponent<Props> {
               activity={activity}
               direction={direction}
               frameNumber={frameNumber}
-              paletteSwaps={paletteSwaps[spriteName]}
+              paletteSwaps={entityToPaletteSwaps[spriteName]}
               onError={(e: any) => this._swapToBehindImage(e)}
             />
           ))
@@ -92,23 +92,23 @@ class CompositeSprite extends React.PureComponent<Props> {
         />
       </span>
     );
-  }
+  };
 
-  _onImageLoaded(image: HTMLImageElement) {
-    if (this.loadedImages.indexOf(image) === -1) {
+  _onImageLoaded = (image: HTMLImageElement) => {
+    if (!this.loadedImages.includes(image)) {
       this.loadedImages.push(image);
     }
 
     if (this._getImages().every(i =>
-      i.complete && this.loadedImages.indexOf(i) > -1
+      i.complete && this.loadedImages.includes(i)
     )) {
       this._drawImages();
     }
-  }
+  };
 
-  _drawImages() {
+  _drawImages = () => {
     const { canvas, container } = this;
-    const { unit,  activity, direction, frameNumber, paletteSwaps, onChange, onImageLoaded } = this.props;
+    const { unit,  activity, direction, frameNumber, entityToPaletteSwaps, onChange, onImageLoaded } = this.props;
 
     const context = canvas?.getContext('2d');
     if (!canvas || !context || !container) {
@@ -132,18 +132,18 @@ class CompositeSprite extends React.PureComponent<Props> {
 
     const sortedImages: ImageWithName[] = [...behindImages, unitImage, ...aheadImages];
 
-    const updatedPaletteSwaps = {...paletteSwaps};
+    const updatedPaletteSwaps = {...entityToPaletteSwaps};
     let arePaletteSwapsUpdated = false;
-    sortedImages.forEach(({ image, spriteName }) => {
+    for (const { image, spriteName } of sortedImages) {
       const imageColors = getImageColors(image);
       if (!updatedPaletteSwaps[spriteName]) {
         arePaletteSwapsUpdated = true;
         updatedPaletteSwaps[spriteName] = {};
       }
-      imageColors.forEach(color => {
+      for (const color of imageColors) {
         updatedPaletteSwaps[spriteName][color] = updatedPaletteSwaps[spriteName][color] || color;
-      });
-    });
+      }
+    }
 
     if (arePaletteSwapsUpdated) {
       onChange && onChange({
@@ -155,15 +155,15 @@ class CompositeSprite extends React.PureComponent<Props> {
     }
 
     const drawPromises = sortedImages.map(({ image, spriteName }) => {
-      const spritePaletteSwaps: Record<string, (string | number[])> = paletteSwaps[spriteName] || {};
+      const spritePaletteSwaps: Record<string, (string | number[])> = entityToPaletteSwaps[spriteName] || {};
       spritePaletteSwaps['#ffffff'] = [0, 0, 0, 0];
       return replaceColors(image, spritePaletteSwaps);
     });
 
     Promise.all(drawPromises).then(swappedImages => {
-      swappedImages.forEach(swappedImage => {
+      for (const swappedImage of swappedImages) {
         context.drawImage(swappedImage, 0, 0);
-      });
+      }
 
       const imageBlob = canvas.toDataURL('image/png').split('base64,')[1];
       const outputFilename = getShortFilename(unit, activity, direction, frameNumber);
@@ -176,7 +176,7 @@ class CompositeSprite extends React.PureComponent<Props> {
     return [...this.container?.querySelectorAll('img')];
   }
 
-  _renderCanvas() {
+  _renderCanvas = () => {
     this.loadedImages = [];
 
     const { canvas } = this;
@@ -189,16 +189,17 @@ class CompositeSprite extends React.PureComponent<Props> {
     const scaleX = (canvas.width / 40);
     const scaleY = (canvas.height / 40);
     context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-    this._getImages().forEach(image => {
+
+    for (const image of this._getImages()) {
       if (image.complete) {
         this._onImageLoaded(image);
       } else {
         image.onload = () => this._onImageLoaded(image);
       }
-    }, this);
+    }
   };
 
-  _swapToBehindImage(e: any) {
+  _swapToBehindImage = (e: any) => {
     e.target.src = e.target.getAttribute('data-behind');
     this._renderCanvas();
   };
