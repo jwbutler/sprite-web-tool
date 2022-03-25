@@ -1,10 +1,11 @@
 import React from 'react';
+import ChangeEvent from '../types/ChangeEvent';
 import styles from './PaletteSwapPanel.css';
 
 type Props = {
   spriteNames: string[],
   paletteSwaps: Record<string, Record<string, string>>,
-  onChange: (e: any) => void;
+  onChange: (e: ChangeEvent) => void;
 };
 
 type State = {
@@ -89,6 +90,7 @@ class PaletteSwapPanel extends React.PureComponent<Props, State> {
     this.props.onChange({
       target: {
         name: 'paletteSwaps',
+        type: 'other',
         value: paletteSwaps
       }
     });

@@ -1,6 +1,7 @@
 import React from 'react';
 import SpriteDefinitions from './SpriteDefinitions';
-import styles from './SpriteTool.css'; // TODO should not use a global style sheet
+import styles from './SpriteTool.css';
+import ChangeEvent from './types/ChangeEvent'; // TODO should not use a global style sheet
 
 const { getImageFilename, getShortFilename, getEquipmentData, getUnitData } = SpriteDefinitions;
 
@@ -48,7 +49,7 @@ type Props = {
   entityToPaletteSwaps: Record<string, Record<string, string | number[]>>,
   width: number,
   height: number,
-  onChange?: (event: any) => void,
+  onChange?: (event: ChangeEvent) => void,
   onImageLoaded?: (outputFilename: string, imageBlob: string) => void
 }
 
@@ -149,6 +150,7 @@ class CompositeSprite extends React.PureComponent<Props> {
       onChange && onChange({
         target: {
           name: 'paletteSwaps',
+          type: 'other',
           value: updatedPaletteSwaps
         }
       });
@@ -171,10 +173,14 @@ class CompositeSprite extends React.PureComponent<Props> {
     });
   };
 
-  _getImages(): HTMLImageElement[] {
-    // @ts-ignore
-    return [...this.container?.querySelectorAll('img')];
-  }
+  _getImages = (): HTMLImageElement[] => {
+    const container = this.container;
+    if (container) {
+      // @ts-ignore
+      return [...container.querySelectorAll('img')];
+    }
+    return [];
+  };
 
   _renderCanvas = () => {
     this.loadedImages = [];
@@ -204,13 +210,9 @@ class CompositeSprite extends React.PureComponent<Props> {
     this._renderCanvas();
   };
 
-  componentDidMount() {
-    this._renderCanvas();
-  }
+  componentDidMount = () => this._renderCanvas();
 
-  componentDidUpdate() {
-    this._renderCanvas();
-  }
+  componentDidUpdate = () => this._renderCanvas();
 }
 
 export default CompositeSprite;
